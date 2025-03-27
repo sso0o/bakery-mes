@@ -1,0 +1,50 @@
+.page-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* 검색 필터 */
+.stock-search {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.stock-search input{
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-width: 240px;
+}
+
+.stock-search select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* 테이블 래퍼 */
+.stock-table {
+    flex: 1;
+    padding: 30px;
+    background-color: #f9f9f9;
+    overflow-y: auto;
+}
+
+/* 테이블 본체 */
+.stock-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.stock-table th,
+.stock-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
