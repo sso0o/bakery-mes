@@ -84,8 +84,8 @@ const ProductProcessPage = () => {
     const handleProductClick = (product) => {
         setSelectedProduct(product);
         fetchProductProcesses(product.id);
-        setForm({ processId: '', stepOrder: '', estimatedMinutes: '' });
         setSelectedProcessId(null);  // 공정 선택 초기화
+        setForm({ processId: '', stepOrder: '', estimatedMinutes: '' });
         setProcessMaterials([]); // 자재 목록 초기화
     };
 
@@ -177,6 +177,7 @@ const ProductProcessPage = () => {
 
             // 순서 업데이트 백엔드에 반영
             await axios.put('http://localhost:8080/api/product-process/reorder', reOrdered);
+            setForm({ processId: '', stepOrder: '', estimatedMinutes: '' });
         } catch (e) {
             alert('삭제 실패');
         }
