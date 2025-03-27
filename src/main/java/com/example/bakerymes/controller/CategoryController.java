@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/categories")
@@ -18,13 +17,13 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public List<Category> getAll(@RequestParam String type) {
+    public List<Category> getAllCategories(@RequestParam String type) {
         return categoryService.getCategoriesByType(type);
     }
 
     @PostMapping
-    public Category create(@RequestBody Category category) {
-        return categoryService.createCategory(category);
+    public Category createCategory(@RequestBody Category category) {
+        return categoryService.saveCategory(category);
     }
 
     @DeleteMapping("/{id}")

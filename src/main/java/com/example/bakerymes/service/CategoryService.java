@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +25,37 @@ public class CategoryService {
     }
 
     // 카테고리 생성
-    public Category createCategory(Category category) {
+    public Category saveCategory(Category category) {
+        String generated = generateCode(category.getType());
+        category.setCodePrefix(generated);
         return categoryRepository.save(category);
     }
+
+    // 코드 자동 생성
+    public String generateCode(String type) {
+        String prefix;
+        switch (type) {
+            case "PRODUCT" -> prefix = "PRD";
+            case "PROCESS" -> prefix = "PRC";
+            case "UNIT" -> prefix = "UNT";
+            case "STATUS" -> prefix = "STS";
+            default -> prefix = "CAT"; // 기본값
+        }
+
+        String lastCode = categoryRepository.findTopByTypeOrderByCodePrefixDesc(type)
+                .map(Category::getCodePrefix)
+                .orElse(null);
+
+        int next = 1;
+        if (lastCode != null && lastCode.length() >= 6) {
+            try {
+                next = Integer.parseInt(lastCode.substring(3)) + 1;
+            } catch (NumberFormatException ignored) {}
+        }
+
+        return String.format("%s%03d", prefix, next);
+    }
+
 
     // 카테고리 삭제
     public void deleteCategory(Long id) {
