@@ -1,0 +1,182 @@
+.page-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* 검색창 영역 */
+.product-search {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.product-search input {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-width: 240px;
+}
+
+.product-search select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.process-copy-box {
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #f2f2f2;
+    border: 1px dashed #ccc;
+    border-radius: 6px;
+}
+
+.process-copy-box select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.process-copy-box button {
+    padding: 14px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.process-copy-box button:hover {
+    background-color: #0056b3;
+}
+
+
+
+/* 왼쪽: 제품 목록 (3) */
+.product-list {
+    flex: 3;
+    padding: 30px;
+    background-color: #f9f9f9;
+    overflow-y: auto;
+}
+
+/* 가운데: 제품 공정 목록 (3) */
+.process-list {
+    flex: 4;
+    padding: 30px;
+    background-color: #ffffff;
+    border-left: 1px solid #ddd;
+    overflow-y: auto;
+}
+
+.process-list button {
+    padding: 6px 12px;
+    font-size: 13px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    color: white;
+}
+
+.process-list .edit {
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.process-list .delete {
+    color: #dc3545;
+    border-color: #dc3545;
+    margin-left: 6px;
+}
+
+.process-list .edit:hover {
+    background-color: #e6f0ff;
+}
+
+.process-list .delete:hover {
+    background-color: #ffe6e6;
+}
+
+.process-material, .product-process {
+    min-height: 50%; /* 최소 높이를 50%로 설정 */
+    overflow-y: auto;
+}
+
+/* 오른쪽: 등록 폼 (4) */
+.process-form {
+    flex: 3;
+    padding: 30px;
+    background-color: #f0f4ff;
+    border-left: 1px solid #ddd;
+}
+
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+
+/* 폼 영역 */
+.process-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.process-form label {
+    display: flex;
+    flex-direction: column;
+    font-size: 15px;
+    color: #333;
+    font-weight: 500;
+}
+
+.process-form input,
+.process-form select {
+    margin-top: 6px;
+    padding: 12px;
+    font-size: 15px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    transition: border-color 0.2s ease;
+}
+
+.process-form input:focus,
+.process-form select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.process-form button {
+    padding: 14px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointerㅌ;
+    transition: background-color 0.2s ease;
+}
+
+.process-form button:hover {
+    background-color: #0056b3;
+}
