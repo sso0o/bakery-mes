@@ -26,5 +26,5 @@ public class Product {
     private Category category; // 예: 케이크류, 쿠키류 등 제품 분류
 
     @Lob
-    private String recipeInfo; // 반죽량, 발효시간 등 (선택)
+    private String description; // 반죽량, 발효시간 등 (선택)
 }

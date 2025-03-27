@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/products")
@@ -16,17 +15,12 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public List<Product> getAll() {
+    public List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
 
     @PostMapping
-    public Product create(@RequestBody Product product) {
+    public Product saveProduct(@RequestBody Product product) {
         return productService.saveProduct(product);
-    }
-
-    @GetMapping("/generate-code")
-    public String generateCode(@RequestParam Long categoryId) {
-        return productService.generateCode(categoryId);
     }
 }
