@@ -27,13 +27,13 @@ const MainPage = () => {
                 <div className="menu-block">
                     <h3 className="menu-title">📂 관리자 메뉴</h3>
                     <div className="menu-list">
-                        <Link to="/categories/product">
-                            <button>제품 등록</button>
+                        <Link to="/categories/PRODUCT">
+                            <button>제품 분류 등록</button>
                         </Link>
-                        <Link to="/categories/process">
+                        <Link to="/categories/PROCESS">
                             <button>공정 등록</button>
                         </Link>
-                        <Link to="/categories/status">
+                        <Link to="/categories/STATUS">
                             <button>상태 등록</button>
                         </Link>
                         <Link to="/work-orders">
@@ -41,6 +41,12 @@ const MainPage = () => {
                         </Link>
                         <Link to="/workers">
                             <button>작업자 등록</button>
+                        </Link>
+                        <Link to="/products">
+                            <button>제품 등록</button>
+                        </Link>
+                        <Link to="/products-process">
+                            <button>제품별 공정 등록</button>
                         </Link>
                     </div>
                 </div>
@@ -53,10 +59,10 @@ const MainPage = () => {
                         <Link to="/material/register">
                             <button>자재 등록</button>
                         </Link>
-                        <Link to="/inbound">
+                        <Link to="/inbounds">
                             <button>자재 입고</button>
                         </Link>
-                        <Link to="/stock">
+                        <Link to="/stocks">
                             <button>자재 조회</button>
                         </Link>
                     </div>

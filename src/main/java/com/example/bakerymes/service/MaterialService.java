@@ -16,7 +16,7 @@ public class MaterialService {
     private final MaterialRepository materialRepository;
     private final CategoryRepository categoryRepository;
 
-    public Material registerMaterial(Material material) {
+    public Material saveMaterial(Material material) {
         Category category = categoryRepository.findById(material.getCategory().getId())
                 .orElseThrow(() -> new RuntimeException("카테고리 없음"));
 

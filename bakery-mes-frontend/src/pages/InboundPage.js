@@ -21,13 +21,11 @@ export default function InboundPage() {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
 
-
+    const user = JSON.parse(localStorage.getItem('user'));
+    const today = new Date().toISOString().split('T')[0]; // 오늘 날짜 (yyyy-mm-dd)
 
     // 입고 목록 및 자재 목록 API 호출
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        const today = new Date().toISOString().split('T')[0]; // 오늘 날짜 (yyyy-mm-dd)
-
         setStartDate(today); // 시작일 초기값 설정
         setEndDate(today);   // 종료일 초기값 설정
 
@@ -49,7 +47,7 @@ export default function InboundPage() {
                 const inboundsRes = await axios.get('http://localhost:8080/api/inbound');
                 setInbounds(inboundsRes.data);
 
-                const categoriesRes = await axios.get('http://localhost:8080/api/materials/categories');
+                const categoriesRes = await axios.get('http://localhost:8080/api/categories?type=MTP');
                 setCategories(categoriesRes.data);
             } catch (error) {
                 console.error("데이터 로딩 실패", error);
@@ -77,6 +75,23 @@ export default function InboundPage() {
         return nameMatch && categoryMatch; // 두 조건이 모두 참일 때만 해당 자재를 반환
     });
 
+    // 카테고리 선택 시 폼 값 초기화
+    const handleCategoryChange = (e) => {
+        const { value } = e.target;
+        setCategoryId(value);  // 카테고리 선택 값 설정
+        setSearchCategory(value);  // 검색 카테고리도 동기화
+
+        // 카테고리 변경 시 폼 값 초기화 (categoryId 제외)
+        const user = JSON.parse(localStorage.getItem('user')); // 로그인한 사용자 정보
+        setForm({
+            materialId: '',
+            quantity: '',
+            unit: '',
+            inboundDate: today,  // 오늘 날짜 유지
+            receivedBy: user ? user.name : '',  // 로그인한 사용자 이름 유지
+            note: form.note  // 기존 비고 값 유지
+        });
+    };
 
 
     // 자재 입력 시 폼 상태 업데이트
@@ -93,23 +108,7 @@ export default function InboundPage() {
         }
     };
 
-    // 카테고리 선택 시 폼 값 초기화
-    const handleCategoryChange = (e) => {
-        const { value } = e.target;
-        setCategoryId(value);  // 카테고리 선택 값 설정
-        setSearchCategory(value);  // 검색 카테고리도 동기화
 
-        // 카테고리 변경 시 폼 값 초기화 (categoryId 제외)
-        const user = JSON.parse(localStorage.getItem('user')); // 로그인한 사용자 정보
-        setForm({
-            materialId: '',
-            quantity: '',
-            unit: '',
-            inboundDate: form.inboundDate,  // 기존 날짜 유지
-            receivedBy: user ? user.name : '',  // 로그인한 사용자 이름 유지
-            note: form.note  // 기존 비고 값 유지
-        });
-    };
 
     // 입고 처리
     const handleSubmit = async (e) => {
@@ -123,8 +122,14 @@ export default function InboundPage() {
             note: form.note
         };
 
+        if (!form.unit) {
+            alert('단위가 비어 있습니다. 다시 선택해 주세요.');
+            return;
+        }
+
         await axios.post('http://localhost:8080/api/inbound', inbound);
         setForm({ materialId: '', quantity: '', unit: '', note: '' });
+
 
         const updated = await axios.get('http://localhost:8080/api/inbound');
         setInbounds(updated.data);
@@ -138,11 +143,11 @@ export default function InboundPage() {
                 <h2>📦 자재 입고 현황</h2>
                 <div className="material-search">
                     <select value={categoryId} onChange={handleCategoryChange} required>
-                    <option value="">전체 카테고리</option>
+                        <option value="">전체 카테고리</option>
                         {categories.map(c => (
                             <option key={c.id} value={c.id}>{c.name}</option>
                         ))}
-                </select>
+                    </select>
                 <input
                     type="date"
                     value={startDate}
@@ -230,7 +235,7 @@ export default function InboundPage() {
                     </label>
                     <label>
                         비고
-                        <input type="text" name="note" value={form.note} onChange={handleChange} required/>
+                        <input type="text" name="note" value={form.note} onChange={handleChange}/>
                     </label>
                     <button type="submit">입고 등록</button>
                 </form>

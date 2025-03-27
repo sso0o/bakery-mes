@@ -6,11 +6,13 @@ import '../styles/MaterialRegisterPage.css';
 const MaterialRegisterPage = () => {
     const [materials, setMaterials] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [units, setUnits] = useState([]);
     const [form, setForm] = useState({
         name: '',
         categoryId: '',
         unit: '',
-        manufacturer: ''
+        manufacturer: '',
+        description: ''
     });
 
     const [searchName, setSearchName] = useState('');
@@ -24,11 +26,22 @@ const MaterialRegisterPage = () => {
     };
 
     useEffect(() => {
-        fetchMaterials();
-        axios.get('http://localhost:8080/api/materials/categories')
-            .then(res => setCategories(res.data))
-            .catch(() => alert('카테고리 불러오기 실패'));
+        const fetchData = async () => {
+            try {
+                await fetchMaterials();
+
+                const categoryRes = await axios.get('http://localhost:8080/api/categories?type=MTP');
+                setCategories(categoryRes.data);
+
+                const unitRes = await axios.get('http://localhost:8080/api/categories?type=UNIT');
+                setUnits(unitRes.data);
+            } catch (e) {
+                alert('카테고리 또는 단위 로딩 실패');
+            }
+        };
+        fetchData();
     }, []);
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -42,6 +55,7 @@ const MaterialRegisterPage = () => {
             unit: form.unit,
             manufacturer: form.manufacturer,
             category: form.categoryId ? { id: form.categoryId } : null,
+            description: form.description
         };
 
         try {
@@ -126,12 +140,20 @@ const MaterialRegisterPage = () => {
                     </label>
                     <label>
                         제조사 / 공급업체
-                        <input type="text" name="manufacturer" value={form.manufacturer} onChange={handleChange}
-                               required/>
+                        <input type="text" name="manufacturer" value={form.manufacturer} onChange={handleChange} required/>
                     </label>
                     <label>
                         단위
-                        <input type="text" name="unit" value={form.unit} onChange={handleChange} required/>
+                        <select name="unit" value={form.unit} onChange={handleChange} required>
+                            <option value="">선택</option>
+                            {units.map(u => (
+                                <option key={u.id} value={u.name}>{u.name}</option>
+                            ))}
+                        </select>
+                    </label>
+                    <label>
+                        설명
+                        <input type="text" name="description" value={form.description} onChange={handleChange} required/>
                     </label>
                     <button type="submit">등록</button>
                 </form>

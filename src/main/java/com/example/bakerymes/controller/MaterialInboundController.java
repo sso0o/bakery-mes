@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/inbound")
 @RequiredArgsConstructor
@@ -19,21 +18,19 @@ public class MaterialInboundController {
     private final MaterialInboundService inboundService;
 
     @GetMapping
-    public List<MaterialInbound> getAll(
+    public List<MaterialInbound> getAllInbounds(
             @RequestParam(required = false) String start,
             @RequestParam(required = false) String end
     ) {
         LocalDate s = (start != null) ? LocalDate.parse(start) : null;
         LocalDate e = (end != null) ? LocalDate.parse(end) : null;
-        return inboundService.getAll(s, e);
+        return inboundService.getAllInbounds(s, e);
     }
 
+    // 입고처리 ( 입고 + 재고추가 )
     @PostMapping
-    public ResponseEntity<MaterialInbound> createMaterialInbound(@RequestBody MaterialInbound inbound) {
-        // 받은 inbound 객체에서 receivedBy 값 확인
-        System.out.println("입고 처리 담당자: " + inbound.getReceivedBy());  // 로그로 확인
-
-        MaterialInbound savedInbound = inboundService.create(inbound);
-        return ResponseEntity.ok(savedInbound);
+    public ResponseEntity<MaterialInbound> saveInbound(@RequestBody MaterialInbound inbound) {
+        inboundService.processInbound(inbound); // 입고 저장 + 재고 반영
+        return ResponseEntity.ok(inbound);
     }
 }
