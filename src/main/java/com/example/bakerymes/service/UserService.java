@@ -34,7 +34,7 @@ public class UserService {
     }
 
     // 작업자 등록
-    public User registerWorker(User user) {
+    public User saveWorker(User user) {
         user.setUserId(generateEmployeeId()); // 사번 자동 생성
         user.setPassword(encodePassword("1234")); // 초기 비밀번호 "1234" 암호화 후 저장
         user.setRole(User.UserRole.WORKER);

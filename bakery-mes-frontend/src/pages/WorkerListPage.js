@@ -6,17 +6,20 @@ import '../styles/WorkerList.css';
 
 Modal.setAppElement('#root');  // 접근성을 위한 설정
 
-const WorkerList = () => {
+const WorkerListPage = () => {
     const [workers, setWorkers] = useState([]);
     const [form, setForm] = useState({ name: '' });
     const [isModalOpen, setIsModalOpen] = useState(false);  // 모달 상태 관리
     const navigate = useNavigate();  // useNavigate 훅을 호출하여 navigate 함수 사용
 
     // 작업자 목록 조회
-    const fetchWorkers = () => {
-        axios.get('http://localhost:8080/api/users?role=WORKER')
-            .then(res => setWorkers(res.data))
-            .catch(err => console.error(err));
+    const fetchWorkers = async () => {
+        try {
+            const res = await axios.get('http://localhost:8080/api/users?role=WORKER');
+            setWorkers(res.data);
+        } catch (err) {
+            console.error('작업자 목록 로딩 실패:', err);
+        }
     };
 
     // 작업자 등록
@@ -124,4 +127,4 @@ const WorkerList = () => {
     );
 };
 
-export default WorkerList;
+export default WorkerListPage;

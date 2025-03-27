@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -18,7 +17,7 @@ public class UserController {
 
     @PostMapping
     public User registerWorker(@RequestBody User user) {
-        return userService.registerWorker(user);
+        return userService.saveWorker(user);
     }
 
     @PostMapping("/login")
@@ -31,7 +30,7 @@ public class UserController {
 
     // 유저 목록 조회 (작업자만 가져오기)
     @GetMapping
-    public List<User> getAllWorkers() {
+    public List<User> getAllUsers() {
         return userService.getAllWorkers(); // 작업자 목록을 반환하는 서비스 메서드
     }
 
