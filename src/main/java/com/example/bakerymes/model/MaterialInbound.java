@@ -30,6 +30,14 @@ public class MaterialInbound {
     @Column(nullable = false)
     private String unit;
 
+    // 박스 당 자재 개수 (예: 한 박스에 20개씩 들어 있음)
+    @Column(nullable = false)
+    private double itemsPerUnit;
+
+    // 총 입고 개수 (박스 수량에 해당하는 자재 개수)
+    @Column(nullable = false)
+    private double totalQuantity;  // 총 개수 (박스 수량 * 박스 당 자재 수, kg이면 단순 수량)
+
     // 입고 일자
     @Column(nullable = false)
     private LocalDate inboundDate;
@@ -41,4 +49,6 @@ public class MaterialInbound {
     // 비고
     @Column
     private String note;
+
+
 }

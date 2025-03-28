@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface MaterialInboundRepository extends JpaRepository<MaterialInbound, Long> {
     List<MaterialInbound> findByInboundDateBetween(LocalDate startDate, LocalDate endDate);
+
+
 }

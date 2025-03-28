@@ -18,19 +18,34 @@ public class MaterialInboundController {
     private final MaterialInboundService inboundService;
 
     @GetMapping
-    public List<MaterialInbound> getAllInbounds(
-            @RequestParam(required = false) String start,
-            @RequestParam(required = false) String end
+    public List<MaterialInbound> getInbounds(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
     ) {
-        LocalDate s = (start != null) ? LocalDate.parse(start) : null;
-        LocalDate e = (end != null) ? LocalDate.parse(end) : null;
-        return inboundService.getAllInbounds(s, e);
+        LocalDate start = (startDate != null) ? LocalDate.parse(startDate) : LocalDate.now();  // 날짜가 없으면 오늘 날짜
+        LocalDate end = (endDate != null) ? LocalDate.parse(endDate) : LocalDate.now();  // 날짜가 없으면 오늘 날짜
+
+        // 날짜가 없으면 전체 입고 내역을 반환, 있으면 날짜 범위에 맞게 필터링
+        return inboundService.getInboundsByDateRange(start, end);
     }
 
-    // 입고처리 ( 입고 + 재고추가 )
+    // 입고처리 + 재고 반영
     @PostMapping
     public ResponseEntity<MaterialInbound> saveInbound(@RequestBody MaterialInbound inbound) {
-        inboundService.processInbound(inbound); // 입고 저장 + 재고 반영
-        return ResponseEntity.ok(inbound);
+        MaterialInbound mi = inboundService.processInbound(inbound); // 입고 저장 + 재고 반영
+        return ResponseEntity.ok(mi);
+    }
+
+    // 입고 수정 + 재고 반영
+    @PutMapping("/{id}")
+    public ResponseEntity<MaterialInbound> updateInbound(@PathVariable Long id, @RequestBody MaterialInbound inbound) {
+        MaterialInbound updatedInbound = inboundService.updateInbound(id, inbound);
+        return ResponseEntity.ok(updatedInbound);
+    }
+
+    // 입고 삭제
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        inboundService.deleteInbound(id); // 입고 삭제 + 재고 반영
     }
 }
