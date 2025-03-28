@@ -12,6 +12,7 @@ const MaterialRegisterPage = () => {
         name: '',
         categoryId: '',
         unit: '',
+        itemsPerUnit: 1,
         outUnit:'',
         manufacturer: '',
         description: ''
@@ -57,9 +58,24 @@ const MaterialRegisterPage = () => {
             name: m.name,
             categoryId: m.category?.id || '',
             unit: m.unit,
+            itemsPerUnit: m.itemsPerUnit,
             outUnit: m.outUnit || '',
             manufacturer: m.manufacturer,
             description: m.description || ''
+        });
+    };
+
+    // 폼 초기화
+    const handleReset = () => {
+        setForm({
+            id: '',
+            name: '',
+            categoryId: '',
+            unit: '',
+            itemsPerUnit: 1,
+            outUnit:'',
+            manufacturer: '',
+            description: ''
         });
     };
 
@@ -68,6 +84,7 @@ const MaterialRegisterPage = () => {
         const data = {
             name: form.name,
             unit: form.unit,
+            itemsPerUnit: form.itemsPerUnit,
             outUnit: form.outUnit,
             manufacturer: form.manufacturer,
             category: form.categoryId ? { id: form.categoryId } : null,
@@ -86,7 +103,7 @@ const MaterialRegisterPage = () => {
                 if (move) {
                     navigate('/inbound');
                 } else {
-                    setForm({ id:'', name: '', categoryId: '', unit: '', outUnit:'', manufacturer: '', description: '' });
+                    setForm({ id:'', name: '', categoryId: '', unit: '', itemsPerUnit:1, outUnit:'', manufacturer: '', description: '' });
                 }
             }
             fetchMaterials();
@@ -108,7 +125,7 @@ const MaterialRegisterPage = () => {
         try {
             await axios.delete(`http://localhost:8080/api/materials/${form.id}`);
             alert('자재가 삭제되었습니다.');
-            setForm({ id:'', name: '', categoryId: '', unit: '', outUnit:'', manufacturer: '', description: '' });
+            setForm({ id:'', name: '', categoryId: '', unit: '', itemsPerUnit:1, outUnit:'', manufacturer: '', description: '' });
             fetchMaterials(); // 자재 목록 새로고침
         } catch (err) {
             alert('삭제 실패');
@@ -159,7 +176,7 @@ const MaterialRegisterPage = () => {
                             <td>{m.category?.name}</td>
                             <td>{m.name}</td>
                             <td>{m.manufacturer}</td>
-                            <td>{m.unit}</td>
+                            <td>{m.unit} {m.itemsPerUnit > 1 ? `(${m.itemsPerUnit})` : '' }</td>
                             <td>{m.outUnit}</td>
                         </tr>
                     ))}
@@ -198,6 +215,10 @@ const MaterialRegisterPage = () => {
                         </select>
                     </label>
                     <label>
+                        단위당 갯수
+                        <input type="number" name="itemsPerUnit" value={form.itemsPerUnit} onChange={handleChange} required/>
+                    </label>
+                    <label>
                         소모 단위
                         <select name="outUnit" value={form.outUnit} onChange={handleChange} required>
                             <option value="">선택</option>
@@ -212,11 +233,18 @@ const MaterialRegisterPage = () => {
                     </label>
                     <button type="submit">{form.id ? '수정' : '등록'}</button>
                 </form>
-                {/* 삭제 버튼 추가 */}
+                {/* 리셋, 삭제 버튼 추가 */}
                 {form.id && (
-                    <button type="button" onClick={handleDelete} style={{backgroundColor: 'red', color: 'white', marginTop: '10px', width: '100%'}}>
-                        삭제
-                    </button>
+                    <>
+                        <button type="button" onClick={handleReset}
+                                style={{backgroundColor: 'green', color: 'white', marginTop: '10px', width: '100%'}}>
+                            폼 리셋
+                        </button>
+                        <button type="button" onClick={handleDelete}
+                                style={{backgroundColor: 'red', color: 'white', marginTop: '10px', width: '100%'}}>
+                            삭제
+                        </button>
+                    </>
                 )}
             </div>
         </div>
