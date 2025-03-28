@@ -31,6 +31,9 @@ public class Material {
     @Column(nullable = false)
     private String unit; // 입고 단위: kg, 봉지, L 등
 
+    @Column(nullable = false)
+    private double itemsPerUnit; // 박스 당 자재 개수 (예: 한 박스에 20개씩 들어 있음)
+
     @Column(nullable = true)
     private String inUnit; // 입고 단위
 
