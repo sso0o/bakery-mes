@@ -7,7 +7,7 @@ const WorkerMenu = () => {
             <Link to="/material/register">
                 <button>자재 등록</button>
             </Link>
-            <Link to="/inbounds">
+            <Link to="/inbound">
                 <button>자재 입고</button>
             </Link>
             <Link to="/stocks">
