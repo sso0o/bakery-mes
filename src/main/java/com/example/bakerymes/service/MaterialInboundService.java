@@ -1,8 +1,7 @@
 package com.example.bakerymes.service;
 
-import com.example.bakerymes.model.Material;
-import com.example.bakerymes.model.MaterialInbound;
-import com.example.bakerymes.model.MaterialStock;
+import com.example.bakerymes.model.*;
+import com.example.bakerymes.repository.LotRepository;
 import com.example.bakerymes.repository.MaterialInboundRepository;
 import com.example.bakerymes.repository.MaterialRepository;
 import com.example.bakerymes.repository.MaterialStockRepository;
@@ -20,6 +19,9 @@ public class MaterialInboundService {
     private final MaterialInboundRepository inboundRepository;
     private final MaterialRepository materialRepository;
     private final MaterialStockRepository stockRepository;
+    private final LotRepository lotRepository;
+
+    private final LotService lotService;
 
     // 입고 목록 조회
     public List<MaterialInbound> getInboundsByDateRange(LocalDate start, LocalDate end) {
@@ -33,7 +35,23 @@ public class MaterialInboundService {
 
         Material material = materialRepository.findById(inbound.getMaterial().getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 자재 없음"));
+        inbound.setStatus(Status.ACTIVE);
         inboundRepository.save(inbound);
+
+        // 롯트 번호 행성
+        String lotNumber = lotService.generateLotNumber(material.getCode(), inbound.getInboundDate());
+
+        // 롯드 생성 후 저장
+        Lot lot = Lot.builder()
+                .lotNumber(lotNumber)
+                .inbound(inbound)
+                .status(Status.ACTIVE)
+                .createdDate(LocalDate.now())
+                .build();
+        lotRepository.save(lot);
+        inbound.setLot(lot); // 양방향 연결
+
+
 
         // 재고 반영
         MaterialStock stock = stockRepository.findByMaterial(material)
@@ -59,6 +77,15 @@ public class MaterialInboundService {
         MaterialInbound oi = inboundRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("입고 내역을 찾을 수 없습니다."));
 
+        // 자재 수정 불가
+        if (!oi.getMaterial().getId().equals(ni.getMaterial().getId())) {
+            throw new IllegalArgumentException("자재는 수정할 수 없습니다. 롯트와 연결되어 있습니다.");
+        }
+        // 입고일 수정 불가
+        if (!oi.getInboundDate().equals(ni.getInboundDate())) {
+            throw new IllegalArgumentException("입고일은 수정할 수 없습니다. 롯트와 연결되어 있습니다.");
+        }
+
         // 기존 수량 차이를 계산하여 재고를 수정
         double quantityDifference = ni.getQuantity() - oi.getQuantity();
 
@@ -67,7 +94,6 @@ public class MaterialInboundService {
         oi.setUnit(ni.getUnit());
         oi.setItemsPerUnit(ni.getItemsPerUnit());
         oi.setTotalQuantity(ni.getTotalQuantity());
-        oi.setInboundDate(ni.getInboundDate());
         oi.setReceivedBy(ni.getReceivedBy());
         oi.setNote(ni.getNote());
 
@@ -104,5 +130,34 @@ public class MaterialInboundService {
         stockRepository.save(stock);
         // 입고 내역 삭제
         inboundRepository.delete(inbound);
+    }
+
+    // 입고 취소
+    @Transactional
+    public void cancelInbound(Long inboundId) {
+        MaterialInbound inbound = inboundRepository.findById(inboundId)
+                .orElseThrow(() -> new IllegalArgumentException("입고 내역을 찾을 수 없습니다."));
+
+        // 이미 취소된 경우 방지
+        if (inbound.getStatus() == Status.CANCELED) {
+            throw new IllegalStateException("이미 취소된 입고입니다.");
+        }
+        inbound.setStatus(Status.CANCELED);
+        inboundRepository.save(inbound);
+
+
+        // 롯트 상태 변경
+        Lot lot = inbound.getLot();
+        if (lot != null) {
+            lot.setStatus(Status.CANCELED);
+            lotRepository.save(lot);
+        }
+
+        // 재고 차감
+        MaterialStock stock = stockRepository.findByMaterial(inbound.getMaterial())
+                .orElseThrow(() -> new IllegalArgumentException("해당 자재의 재고 정보가 없습니다."));
+
+        stock.setQuantity(stock.getQuantity() - inbound.getQuantity());
+        stockRepository.save(stock);
     }
 }

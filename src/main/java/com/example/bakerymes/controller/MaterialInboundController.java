@@ -29,7 +29,7 @@ public class MaterialInboundController {
         return inboundService.getInboundsByDateRange(start, end);
     }
 
-    // 입고처리 + 재고 반영
+    // 입고처리 + 재고 반영 + 롯트 생성
     @PostMapping
     public ResponseEntity<MaterialInbound> saveInbound(@RequestBody MaterialInbound inbound) {
         MaterialInbound mi = inboundService.processInbound(inbound); // 입고 저장 + 재고 반영
@@ -43,9 +43,9 @@ public class MaterialInboundController {
         return ResponseEntity.ok(updatedInbound);
     }
 
-    // 입고 삭제
+    // 입고 취소 + 롯트 반영 + 재고 반영
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        inboundService.deleteInbound(id); // 입고 삭제 + 재고 반영
+        inboundService.cancelInbound(id); // 입고 취소 + 재고 반영
     }
 }

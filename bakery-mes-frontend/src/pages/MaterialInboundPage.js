@@ -80,6 +80,26 @@ export default function MaterialInboundPage() {
         fetchData();
     }, []);
 
+    const handleRowClick = (i) => {
+        // 취소된 건 무시
+        if (i.status === 'CANCELED') return;
+
+        setForm({
+            id: i.id,
+            materialId: String(i.material.id),
+            categoryId: String(i.material.category.id),
+            quantity: i.quantity,
+            unit: i.unit,
+            itemsPerUnit: i.itemsPerUnit,
+            totalQuantity: i.totalQuantity,
+            inboundDate: i.inboundDate,
+            receivedBy: i.receivedBy,
+            note: i.note || ''
+        });
+        setCategoryId(String(i.material.category.id)); // 자재 필터 유지
+    };
+
+
 
     // 자재 입력 시 폼 상태 업데이트
     const handleChange = (e) => {
@@ -93,6 +113,7 @@ export default function MaterialInboundPage() {
                 const selected = materials.find(m => m.id === parseInt(value));
                 if (selected) {
                     updatedForm.unit = selected.unit;  // 자재의 단위 자동 설정
+                    updatedForm.itemsPerUnit = selected.itemsPerUnit;  // itemsPerUnit 자동 설정
                 }
             }
 
@@ -107,28 +128,10 @@ export default function MaterialInboundPage() {
         });
     };
 
-    // 테이블 클릭 시 수정 폼에 해당 자재 정보 세팅
-    const handleRowClick = (i) => {
-        setForm({
-            id:i.id,
-            categoryId:i.material.category.id,
-            materialId: i.material.id,
-            quantity: i.quantity,
-            unit: i.unit,
-            itemsPerUnit: i.itemsPerUnit,
-            totalQuantity: i.totalQuantity,
-            inboundDate: i.inboundDate,
-            receivedBy: i.receivedBy,
-            note: i.note,
-        });
-        setCategoryId(i.material.category.id);  // 카테고리 아이디를 동기화
-
-    };
-
     // 입고 처리
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const inbound = {
+        const data = {
             material: { id: form.materialId },
             quantity: parseFloat(form.quantity),
             unit: form.unit,
@@ -142,11 +145,11 @@ export default function MaterialInboundPage() {
         try {
             if (form.id) {
                 // 수정 요청 (PUT)
-                await axios.put(`http://localhost:8080/api/inbound/${form.id}`, inbound);
+                await axios.put(`http://localhost:8080/api/inbound/${form.id}`, data);
                 alert('입고 정보가 수정되었습니다.');
             } else {
                 // 신규 등록
-                await axios.post('http://localhost:8080/api/inbound', inbound);
+                await axios.post('http://localhost:8080/api/inbound', data);
                 alert('입고 정보가 등록되었습니다.');
             }
         } catch (error) {
@@ -170,6 +173,7 @@ export default function MaterialInboundPage() {
         const user = JSON.parse(localStorage.getItem('user'));
         setForm({
             id: '',
+            categoryId: '',
             materialId: '',
             quantity: 1,
             unit: '',
@@ -182,19 +186,19 @@ export default function MaterialInboundPage() {
         setCategoryId('');  // 카테고리 선택 초기화
     };
 
-    // 입고 삭제
-    const handleDelete = async () => {
+    // 입고 취소
+    const handleCancel = async () => {
         if (!form.id) {
-            alert('삭제할 자재를 선택하세요.');
+            alert('취소할 입고 내역을 선택하세요.');
             return;
         }
 
-        const confirmDelete = window.confirm('정말로 자재를 삭제하시겠습니까?');
+        const confirmDelete = window.confirm('정말로 취소하시겠습니까?');
         if (!confirmDelete) return;
 
         try {
             await axios.delete(`http://localhost:8080/api/inbound/${form.id}`);
-            alert('자재가 삭제되었습니다.');
+            alert('취소되었습니다.');
             // 삭제 후 폼 리셋 및 입고 목록 갱신
             handleReset();  // 폼 초기화
             const updatedInbounds = await axios.get('http://localhost:8080/api/inbound', {
@@ -205,7 +209,7 @@ export default function MaterialInboundPage() {
             });
             setInbounds(updatedInbounds.data);  // 입고 목록 갱신
         } catch (err) {
-            alert('삭제 실패');
+            alert('취소 실패');
         }
     };
 
@@ -278,7 +282,10 @@ export default function MaterialInboundPage() {
                     </thead>
                     <tbody>
                     {filteredInbounds.map(i => (
-                        <tr key={i.id} onClick={() => handleRowClick(i)}  style={{cursor: 'pointer'}} >
+                        <tr key={i.id}
+                            onClick={() => handleRowClick(i)}
+                            style={{ cursor: i.status === 'CANCELED' ? 'default' : 'pointer' }}
+                            className={i.status === 'CANCELED' ? 'inbound-row-canceled' : ''} >
                             <td>{i.material.category.name}</td>
                             <td>{i.material.manufacturer}</td>
                             <td>{i.material.name}</td>
@@ -300,6 +307,7 @@ export default function MaterialInboundPage() {
                     <label>
                         자재 카테고리
                         <select value={categoryId} onChange={handleCategoryChange} disabled={form.id ? true : false} required>
+
                             <option value="">선택</option>
                             {categories.map(c => (
                                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -333,7 +341,7 @@ export default function MaterialInboundPage() {
                     </label>
                     <label>
                         입고일
-                        <input type="date" name="inboundDate" value={form.inboundDate} onChange={handleChange}/>
+                        <input type="date" name="inboundDate" value={form.inboundDate} onChange={handleChange} disabled={form.id ? true : false} required/>
                     </label>
                     <label>
                         담당자
@@ -352,9 +360,9 @@ export default function MaterialInboundPage() {
                                 style={{backgroundColor: 'green', color: 'white', marginTop: '10px', width: '100%'}}>
                             폼 리셋
                         </button>
-                        <button type="button" onClick={handleDelete}
+                        <button type="button" onClick={handleCancel}
                                 style={{backgroundColor: 'red', color: 'white', marginTop: '10px', width: '100%'}}>
-                            삭제
+                            입고 취소
                         </button>
                     </>
                 )}

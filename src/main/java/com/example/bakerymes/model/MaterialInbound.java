@@ -1,5 +1,6 @@
 package com.example.bakerymes.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -50,5 +51,11 @@ public class MaterialInbound {
     @Column
     private String note;
 
+    @OneToOne(mappedBy = "inbound", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private Lot lot;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status; // 예: ACTIVE, CANCELED
 }

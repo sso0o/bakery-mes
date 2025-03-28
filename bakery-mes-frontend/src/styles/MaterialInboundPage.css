@@ -10,6 +10,12 @@
     overflow-y: auto;
 }
 
+.inbound-row-canceled {
+    background-color: #f0f0f0;
+    color: #999;
+    text-decoration: line-through;
+}
+
 .inbound-form {
     flex: 3;
     padding: 30px;
