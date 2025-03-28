@@ -17,17 +17,30 @@ public class MaterialController {
     private final MaterialService materialService;
     private final CategoryService categoryService;
 
-    // 자재 등록
-    @PostMapping
-    public Material createMaterial(@RequestBody Material material) {
-        return materialService.saveMaterial(material);
-    }
-
     // 자재 전체 조회
     @GetMapping
     public List<Material> getAllMaterials() {
         return materialService.getAllMaterials();
     }
+
+    // 자재 등록
+    @PostMapping
+    public Material save(@RequestBody Material material) {
+        return materialService.saveMaterial(material);
+    }
+
+    // 자재 수정
+    @PutMapping("/{id}")
+    public Material update(@PathVariable Long id, @RequestBody Material material) {
+        return materialService.updateMaterial(id, material);
+    }
+
+    // 자재 삭제
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        materialService.deleteMaterial(id);
+    }
+
 
 
 }

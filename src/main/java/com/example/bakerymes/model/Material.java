@@ -29,7 +29,13 @@ public class Material {
     private Category category; // 재료 종류 (Category.type = "MaterialType")
 
     @Column(nullable = false)
-    private String unit; // 단위: kg, 봉지, L 등
+    private String unit; // 입고 단위: kg, 봉지, L 등
+
+    @Column(nullable = true)
+    private String inUnit; // 입고 단위
+
+    @Column(nullable = true)
+    private String outUnit; // 사용 단위
 
     @Column
     private String description; // 비고 또는 설명 (선택)
