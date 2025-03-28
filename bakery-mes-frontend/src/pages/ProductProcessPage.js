@@ -289,72 +289,80 @@ const ProductProcessPage = () => {
                 <div className="product-process">
                     <h2>🔧 제품 공정 순서</h2>
                     {selectedProduct ? (
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>순서</th>
-                                <th>공정명</th>
-                                <th>예상시간</th>
-                                <th>삭제</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {productProcesses.map(p => (
-                                <tr
-                                    key={p.id}
-                                    onClick={() => handleRowClick(p)} // 행 클릭 시 폼에 데이터 세팅
-                                    style={{
-                                        cursor: 'pointer',
-                                        backgroundColor: selectedProcessId === p.id ? '#e6f7ff' : ''
-                                    }}
-                                >
-                                    <td>{p.stepOrder}</td>
-                                    <td>{p.process?.name}</td>
-                                    <td>{p.estimatedMinutes ?? '-'} 분</td>
-                                    <td>
-                                        <div className="manage-buttons">
-                                            <button
-                                                className="delete"
-                                                onClick={() => handleDelete(p.id)}
-                                            >
-                                                삭제
-                                            </button>
-                                        </div>
-                                    </td>
+                        productProcesses.length > 0 ? (
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>순서</th>
+                                    <th>공정명</th>
+                                    <th>예상시간</th>
+                                    <th>삭제</th>
                                 </tr>
-                            ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                {productProcesses.map(p => (
+                                    <tr
+                                        key={p.id}
+                                        onClick={() => handleRowClick(p)} // 행 클릭 시 폼에 데이터 세팅
+                                        style={{
+                                            cursor: 'pointer',
+                                            backgroundColor: selectedProcessId === p.id ? '#e6f7ff' : ''
+                                        }}
+                                    >
+                                        <td>{p.stepOrder}</td>
+                                        <td>{p.process?.name}</td>
+                                        <td>{p.estimatedMinutes ?? '-'} 분</td>
+                                        <td>
+                                            <div className="manage-buttons">
+                                                <button
+                                                    className="delete"
+                                                    onClick={() => handleDelete(p.id)}
+                                                >
+                                                    삭제
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        ) : (
+                            <p>등록된 공정이 없습니다. </p>
+                        )
                     ) : (
                         <p>제품을 선택해주세요</p>
                     )}
                 </div>
                 <div className="process-material">
                     <h2>🔧 공정별 자재</h2>
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>코드</th>
-                            <th>이름</th>
-                            <th>소모량</th>
-                            <th>단위</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {processMaterials.map((material) => (
-                            <tr key={material.id}>
-                                <td>{material.quantity}</td>
-                                {/* 자재 코드 */}
-                                <td>{material.quantity}</td>
-                                {/* 자재 이름 */}
-                                <td>{material.quantity}</td>
-                                {/* 소모량 */}
-                                <td>{material.unit}</td>
-                                {/* 단위 */}
+                    {selectedProcessId ? (
+                        processMaterials.length > 0 ? (
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>코드</th>
+                                <th>이름</th>
+                                <th>소모량</th>
+                                <th>단위</th>
                             </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {processMaterials.map((m) => (
+                                <tr key={m.id}>
+                                    <td>{m.material.code}</td> {/* 자재 코드 */}
+                                    <td>{m.material.name}</td> {/* 자재 이름 */}
+                                    <td>{m.quantity}</td> {/* 소모량 */}
+                                    <td>{m.unit}</td> {/* 단위 */}
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                        ) : (
+                            <p>등록된 자재가 없습니다. </p>
+                        )
+                    ) : (
+                    <p>공정을 선택해주세요</p>
+                )}
                 </div>
             </div>
 
