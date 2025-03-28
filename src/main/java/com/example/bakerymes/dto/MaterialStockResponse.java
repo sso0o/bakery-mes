@@ -15,7 +15,10 @@ public class MaterialStockResponse {
     private String name;
     private String manufacturer;
     private String unit;
+    private double itemsPerUnit;
     private String categoryName;
-    private double quantity;
+    private double quantity; // 재고 수량
+    private double totalQuantity; // 입고 수량 * itemsPerUnit
     private LocalDate lastInboundDate;
+
 }

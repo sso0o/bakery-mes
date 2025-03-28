@@ -54,24 +54,26 @@ export default function MaterialStockPage() {
                 <table>
                     <thead>
                     <tr>
-                        <th>코드</th>
                         <th>카테고리</th>
+                        <th>코드</th>
                         <th>자재명</th>
                         <th>제조사</th>
                         <th>수량</th>
                         <th>단위</th>
+                        <th>총 량</th>
                         <th>최종 입고일</th>
                     </tr>
                     </thead>
                     <tbody>
                     {filtered.map(s => (
                         <tr key={s.materialId}>
-                            <td>{s.code}</td>
                             <td>{s.categoryName}</td>
+                            <td>{s.code}</td>
                             <td>{s.name}</td>
                             <td>{s.manufacturer}</td>
                             <td>{s.quantity}</td>
                             <td>{s.unit}</td>
+                            <td>{s.quantity} {s.itemsPerUnit > 1 ? `(${s.itemsPerUnit})` : s.unit}</td>
                             <td>{s.lastInboundDate}</td>
                         </tr>
                     ))}
