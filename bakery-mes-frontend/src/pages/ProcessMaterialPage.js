@@ -9,6 +9,10 @@ const ProcessMaterialPage = () => {
     const [processMaterials, setProcessMaterials] = useState([]);
     const [form, setForm] = useState({ materialId: '', quantity: '', unit: '' });
 
+    useEffect(() => {
+        fetchInitialData();
+    }, []);
+
     const fetchInitialData = async () => {
         const ppRes = await axios.get('http://localhost:8080/api/product-process/all');
         const mRes = await axios.get('http://localhost:8080/api/materials');
@@ -21,9 +25,6 @@ const ProcessMaterialPage = () => {
         setProcessMaterials(res.data);
     };
 
-    useEffect(() => {
-        fetchInitialData();
-    }, []);
 
     const handlePPChange = (e) => {
         const ppId = e.target.value;
