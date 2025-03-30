@@ -52,7 +52,7 @@ public class MaterialInbound {
     private String note;
 
     @OneToOne(mappedBy = "inbound", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonManagedReference("inbound-lot")
     private Lot lot;
 
     @Column(nullable = false)

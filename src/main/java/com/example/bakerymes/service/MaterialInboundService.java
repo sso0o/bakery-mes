@@ -39,7 +39,7 @@ public class MaterialInboundService {
         inboundRepository.save(inbound);
 
         // 롯트 번호 행성
-        String lotNumber = lotService.generateLotNumber(material.getCode(), inbound.getInboundDate());
+        String lotNumber = lotService.createLotNumber(material.getCode(), inbound.getInboundDate());
 
         // 롯드 생성 후 저장
         Lot lot = Lot.builder()
@@ -52,7 +52,6 @@ public class MaterialInboundService {
         inbound.setLot(lot); // 양방향 연결
 
 
-
         // 재고 반영
         MaterialStock stock = stockRepository.findByMaterial(material)
                 .orElseGet(() -> MaterialStock.builder()
@@ -61,7 +60,7 @@ public class MaterialInboundService {
                         .unit(material.getUnit())
                         .lastInboundDate(inbound.getInboundDate())
                         .build());
-        stock.setQuantity(stock.getQuantity() + inbound.getQuantity());
+        stock.setQuantity(stock.getQuantity() + (inbound.getQuantity() * inbound.getMaterial().getCapacity()));
         stock.setLastInboundDate(inbound.getInboundDate());
 
         stockRepository.save(stock);
@@ -104,7 +103,8 @@ public class MaterialInboundService {
         MaterialStock stock = stockRepository.findByMaterial(material)
                 .orElseThrow(() -> new IllegalArgumentException("해당 자재의 재고 정보가 없습니다."));
 
-        stock.setQuantity(stock.getQuantity() + quantityDifference);
+        double capacity = material.getCapacity() != null ? material.getCapacity() : 1.0;
+        stock.setQuantity(stock.getQuantity() + (quantityDifference * capacity));
         stock.setLastInboundDate(ni.getInboundDate());
 
         stockRepository.save(stock); // 재고 저장

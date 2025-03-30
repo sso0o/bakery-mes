@@ -21,11 +21,8 @@ public class MaterialService {
         Category category = categoryRepository.findById(material.getCategory().getId())
                 .orElseThrow(() -> new RuntimeException("카테고리 없음"));
 
-        // 같은 카테고리 자재 개수 세기
-        long count = materialRepository.countByCategory(category);
+        String newCode = createMaterialCode(category);
 
-        // 자재 코드 생성: 카테고리 prefix + - + 순번
-        String newCode = category.getCodePrefix() + "-" + String.format("%03d", count + 1);
         material.setCode(newCode);
         material.setCategory(category);
 
@@ -40,17 +37,13 @@ public class MaterialService {
     public Material updateMaterial(Long id, Material material) {
         Material m = materialRepository.findById(id) .orElseThrow(() -> new RuntimeException("해당 자재 없음"));
 
-        Category newCategory = categoryRepository.findById(material.getCategory().getId())
-               .orElseThrow(() -> new RuntimeException("변경할 카테고리 없음"));
-
-        // 같은 카테고리 자재 개수 세기
-        long count = materialRepository.countByCategory(newCategory);
-        String newCode = newCategory.getCodePrefix() + "-" + String.format("%03d", count + 1);
-        m.setCode(newCode);
-        m.setCategory(newCategory);
+        // 카테고리 변경 방지
+        if (!m.getCategory().getId().equals(material.getCategory().getId())) {
+            throw new IllegalArgumentException("카테고리는 수정할 수 없습니다.");
+        }
 
         m.setName(material.getName());
-        m.setName(material.getName());
+        m.setCapacity(material.getCapacity());
         m.setUnit(material.getUnit());
         m.setOutUnit(material.getOutUnit());
         m.setManufacturer(material.getManufacturer());
@@ -63,5 +56,22 @@ public class MaterialService {
         Material m = materialRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당 자재 없음"));
         materialRepository.delete(m);
+    }
+
+    public String createMaterialCode(Category category) {
+        String prefix = category.getCodePrefix(); // 예: MTP001
+        String lastCode = materialRepository.findLastCodeByCategory(category); // 예: MTP001-005
+
+        int nextNumber = 1;
+        if (lastCode != null && lastCode.startsWith(prefix)) {
+            String[] parts = lastCode.split("-");
+            if (parts.length == 2) {
+                try {
+                    nextNumber = Integer.parseInt(parts[1]) + 1;
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+
+        return String.format("%s-%03d", prefix, nextNumber);
     }
 }

@@ -16,7 +16,7 @@ export default function MaterialStockPage() {
         try {
             const [stockRes, categoryRes] = await Promise.all([
                 axios.get('http://localhost:8080/api/materials/stocks'),
-                axios.get(`http://localhost:8080/api/categories?type=MTP`)
+                axios.get(`http://localhost:8080/api/categories?type=PRODUCT`)
             ]);
             setStocks(stockRes.data);
             setCategories(categoryRes.data);
@@ -73,7 +73,7 @@ export default function MaterialStockPage() {
                             <td>{s.manufacturer}</td>
                             <td>{s.quantity}</td>
                             <td>{s.unit}</td>
-                            <td>{s.quantity} {s.itemsPerUnit > 1 ? `(${s.itemsPerUnit})` : s.unit}</td>
+                            <td>{s.quantity} {s.itemsPerUnit > 1 ? `${s.unit}(${s.itemsPerUnit})` : s.unit}</td>
                             <td>{s.lastInboundDate}</td>
                         </tr>
                     ))}

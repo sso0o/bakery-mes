@@ -28,6 +28,10 @@ public class Material {
     @JoinColumn(name = "category_id")
     private Category category; // 재료 종류 (Category.type = "MaterialType")
 
+    @Column(nullable = true)
+    private Double capacity; // 자재 용량 (예: 20kg, 500ml 등)
+
+
     @Column(nullable = false)
     private String unit; // 입고 단위: kg, 봉지, L 등
 

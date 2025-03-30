@@ -23,6 +23,15 @@
     border-left: 1px solid #ddd;
 }
 
+.inbound-form .row-inline {
+    display: flex;
+    gap: 20px;
+}
+
+.inbound-form .row-inline label {
+    flex: 1;
+}
+
 .inbound-form h2 {
     font-size: 20px;
     margin-bottom: 24px;

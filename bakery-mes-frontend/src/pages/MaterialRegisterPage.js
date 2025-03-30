@@ -11,6 +11,7 @@ const MaterialRegisterPage = () => {
         id: '',
         name: '',
         categoryId: '',
+        capacity: '',
         unit: '',
         itemsPerUnit: 1,
         outUnit:'',
@@ -23,17 +24,14 @@ const MaterialRegisterPage = () => {
 
     const navigate = useNavigate();
 
-    const fetchMaterials = async () => {
-        const res = await axios.get('http://localhost:8080/api/materials');
-        setMaterials(res.data);
-    };
+
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 await fetchMaterials();
 
-                const categoryRes = await axios.get('http://localhost:8080/api/categories?type=MTP');
+                const categoryRes = await axios.get('http://localhost:8080/api/categories?type=MATERIAL');
                 setCategories(categoryRes.data);
 
                 const unitRes = await axios.get('http://localhost:8080/api/categories?type=UNIT');
@@ -44,6 +42,11 @@ const MaterialRegisterPage = () => {
         };
         fetchData();
     }, []);
+
+    const fetchMaterials = async () => {
+        const res = await axios.get('http://localhost:8080/api/materials');
+        setMaterials(res.data);
+    };
 
 
     const handleChange = (e) => {
@@ -57,6 +60,7 @@ const MaterialRegisterPage = () => {
             id: m.id, // id를 추가하여 수정 모드로 설정
             name: m.name,
             categoryId: m.category?.id || '',
+            capacity: m.capacity || '',
             unit: m.unit,
             itemsPerUnit: m.itemsPerUnit,
             outUnit: m.outUnit || '',
@@ -71,6 +75,7 @@ const MaterialRegisterPage = () => {
             id: '',
             name: '',
             categoryId: '',
+            capacity: '',
             unit: '',
             itemsPerUnit: 1,
             outUnit:'',
@@ -83,6 +88,7 @@ const MaterialRegisterPage = () => {
         e.preventDefault();
         const data = {
             name: form.name,
+            capacity: form.capacity,
             unit: form.unit,
             itemsPerUnit: form.itemsPerUnit,
             outUnit: form.outUnit,
@@ -103,7 +109,7 @@ const MaterialRegisterPage = () => {
                 if (move) {
                     navigate('/inbound');
                 } else {
-                    setForm({ id:'', name: '', categoryId: '', unit: '', itemsPerUnit:1, outUnit:'', manufacturer: '', description: '' });
+                    setForm({ id:'', name: '', categoryId: '', capacity: '', unit: '', itemsPerUnit:1, outUnit:'', manufacturer: '', description: '' });
                 }
             }
             fetchMaterials();
@@ -125,7 +131,7 @@ const MaterialRegisterPage = () => {
         try {
             await axios.delete(`http://localhost:8080/api/materials/${form.id}`);
             alert('자재가 삭제되었습니다.');
-            setForm({ id:'', name: '', categoryId: '', unit: '', itemsPerUnit:1, outUnit:'', manufacturer: '', description: '' });
+            setForm({ id:'', name: '', categoryId: '', capacity: '',unit: '', itemsPerUnit:1, outUnit:'', manufacturer: '', description: '' });
             fetchMaterials(); // 자재 목록 새로고침
         } catch (err) {
             alert('삭제 실패');
@@ -165,17 +171,20 @@ const MaterialRegisterPage = () => {
                         <th>카테고리</th>
                         <th>이름</th>
                         <th>회사</th>
+                        <th>용량</th>
                         <th>입고단위</th>
                         <th>소모단위</th>
                     </tr>
                     </thead>
                     <tbody>
                     {filteredMaterials.map(m => (
-                        <tr key={m.id} onClick={() => handleRowClick(m)} style={{cursor: 'pointer'}}>
+                        <tr key={m.id} onClick={() => handleRowClick(m)}
+                            style={{cursor: 'pointer', background: form.id === m.id ? '#e6f7ff' : ''}} >
                             <td>{m.code}</td>
                             <td>{m.category?.name}</td>
                             <td>{m.name}</td>
                             <td>{m.manufacturer}</td>
+                            <td>{m.capacity}</td>
                             <td>{m.unit} {m.itemsPerUnit > 1 ? `(${m.itemsPerUnit})` : '' }</td>
                             <td>{m.outUnit}</td>
                         </tr>
@@ -189,7 +198,9 @@ const MaterialRegisterPage = () => {
                 <form onSubmit={handleSubmit}>
                     <label>
                         카테고리
-                        <select name="categoryId" value={form.categoryId} onChange={handleChange} required>
+                        <select name="categoryId" value={form.categoryId} onChange={handleChange}
+                                disabled={form.id ? true : false}
+                                required>
                             <option value="">선택</option>
                             {categories.map(c => (
                                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -198,12 +209,17 @@ const MaterialRegisterPage = () => {
                     </label>
                     <label>
                         자재 이름
-                        <input type="text" name="name" value={form.name} onChange={handleChange} required/>
+                        <input type="text" name="name" value={form.name} onChange={handleChange}
+                               required/>
                     </label>
                     <label>
                         제조사 / 공급업체
                         <input type="text" name="manufacturer" value={form.manufacturer} onChange={handleChange}
                                required/>
+                    </label>
+                    <label>
+                        용량
+                        <input type="number" name="capacity" value={form.capacity} onChange={handleChange}/>
                     </label>
                     <label>
                         입고 단위
@@ -216,7 +232,8 @@ const MaterialRegisterPage = () => {
                     </label>
                     <label>
                         단위당 갯수
-                        <input type="number" name="itemsPerUnit" value={form.itemsPerUnit} onChange={handleChange} required/>
+                        <input type="number" name="itemsPerUnit" value={form.itemsPerUnit} onChange={handleChange}
+                               required/>
                     </label>
                     <label>
                         소모 단위
@@ -236,7 +253,7 @@ const MaterialRegisterPage = () => {
                 {/* 리셋, 삭제 버튼 추가 */}
                 {form.id && (
                     <>
-                        <button type="button" onClick={handleReset}
+                    <button type="button" onClick={handleReset}
                                 style={{backgroundColor: 'green', color: 'white', marginTop: '10px', width: '100%'}}>
                             폼 리셋
                         </button>

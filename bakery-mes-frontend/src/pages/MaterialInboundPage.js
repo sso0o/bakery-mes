@@ -11,10 +11,11 @@ export default function MaterialInboundPage() {
         id:'',
         categoryId:'',
         materialId: '',
-        quantity: 1,
+        capacity: '',
         unit: '',
-        itemsPerUnit:1,
-        totalQuantity:1,
+        itemsPerUnit: '',
+        quantity: '',
+        totalQuantity: '',
         inboundDate: '',
         receivedBy: '',
         note: ''
@@ -46,10 +47,11 @@ export default function MaterialInboundPage() {
             id:'',
             categoryId:'',
             materialId: '',
-            quantity: 1,
+            capacity: '',
             unit: '',
-            itemsPerUnit:1,
-            totalQuantity:1,
+            itemsPerUnit: '',
+            quantity: '',
+            totalQuantity: '',
             inboundDate: todayFormatted,
             receivedBy: user ? user.name : '',  // 로그인한 사용자 이름 세팅
             note: ''  // 비고 값 초기화
@@ -69,7 +71,7 @@ export default function MaterialInboundPage() {
                 });
                 setInbounds(inboundsRes.data);
 
-                const categoriesRes = await axios.get('http://localhost:8080/api/categories?type=MTP');
+                const categoriesRes = await axios.get('http://localhost:8080/api/categories?type=MATERIAL');
                 setCategories(categoriesRes.data);
                 setSearchCategories(categoriesRes.data);
             } catch (error) {
@@ -88,9 +90,10 @@ export default function MaterialInboundPage() {
             id: i.id,
             materialId: String(i.material.id),
             categoryId: String(i.material.category.id),
-            quantity: i.quantity,
+            capacity: i.material.capacity,
             unit: i.unit,
             itemsPerUnit: i.itemsPerUnit,
+            quantity: i.quantity,
             totalQuantity: i.totalQuantity,
             inboundDate: i.inboundDate,
             receivedBy: i.receivedBy,
@@ -134,6 +137,7 @@ export default function MaterialInboundPage() {
         const data = {
             material: { id: form.materialId },
             quantity: parseFloat(form.quantity),
+            capacity: form.capacity,
             unit: form.unit,
             itemsPerUnit: parseInt(form.itemsPerUnit),
             totalQuantity: parseFloat(form.totalQuantity),
@@ -175,10 +179,11 @@ export default function MaterialInboundPage() {
             id: '',
             categoryId: '',
             materialId: '',
-            quantity: 1,
+            capacity: '',
             unit: '',
-            itemsPerUnit: 1,
-            totalQuantity: 1,
+            itemsPerUnit: '',
+            quantity: '',
+            totalQuantity: '',
             inboundDate: todayFormatted,  // 오늘 날짜 유지
             receivedBy: user ? user.name : '',
             note: ''
@@ -273,8 +278,9 @@ export default function MaterialInboundPage() {
                         <th>카테고리</th>
                         <th>제공업체</th>
                         <th>자재</th>
-                        <th>수량</th>
+                        <th>용량</th>
                         <th>단위</th>
+                        <th>수량</th>
                         <th>입고일</th>
                         <th>비고</th>
                         <th>담당자</th>
@@ -284,13 +290,14 @@ export default function MaterialInboundPage() {
                     {filteredInbounds.map(i => (
                         <tr key={i.id}
                             onClick={() => handleRowClick(i)}
-                            style={{ cursor: i.status === 'CANCELED' ? 'default' : 'pointer' }}
+                            style={{ cursor: i.status === 'CANCELED' ? 'default' : 'pointer' , background: form.id === i.id ? '#e6f7ff' : ''}}
                             className={i.status === 'CANCELED' ? 'inbound-row-canceled' : ''} >
                             <td>{i.material.category.name}</td>
                             <td>{i.material.manufacturer}</td>
                             <td>{i.material.name}</td>
-                            <td>{i.quantity}</td>
+                            <td>{i.material.capacity}</td>
                             <td>{i.unit}</td>
+                            <td>{i.quantity}</td>
                             <td>{i.inboundDate}</td>
                             <td>{i.description}</td>
                             <td>{i.receivedBy}</td>
@@ -306,8 +313,8 @@ export default function MaterialInboundPage() {
                 <form onSubmit={handleSubmit}>
                     <label>
                         자재 카테고리
-                        <select value={categoryId} onChange={handleCategoryChange} disabled={form.id ? true : false} required>
-
+                        <select value={categoryId} onChange={handleCategoryChange} disabled={form.id ? true : false}
+                                required>
                             <option value="">선택</option>
                             {categories.map(c => (
                                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -316,32 +323,44 @@ export default function MaterialInboundPage() {
                     </label>
                     <label>
                         자재 선택
-                        <select name="materialId" value={form.materialId} onChange={handleChange} disabled={form.id ? true : false} required>
+                        <select name="materialId" value={form.materialId} onChange={handleChange}
+                                disabled={form.id ? true : false} required>
                             <option value="">선택</option>
                             {filteredMaterials.map(m => (
                                 <option key={m.id} value={m.id}>[{m.manufacturer}] {m.name}</option>
                             ))}
                         </select>
                     </label>
-                    <label>
-                        수량
-                        <input type="number" name="quantity" value={form.quantity} onChange={handleChange} required/>
-                    </label>
-                    <label>
-                        단위
-                        <input type="text" name="unit" value={form.unit} readOnly/>
-                    </label>
-                    <label>
-                        단위당 갯수
-                        <input type="number" name="itemsPerUnit" value={form.itemsPerUnit} onChange={handleChange} required/>
-                    </label>
-                    <label>
-                        총 수량
-                        <input type="number" name="totalQuantity" value={form.totalQuantity} readOnly/>
-                    </label>
+                    <div className="row-inline">
+                        <label>
+                            용량
+                            <input type="text" name="capacity" value={form.capacity} readOnly/>
+                        </label>
+                        <label>
+                            단위
+                            <input type="text" name="unit" value={form.unit} readOnly/>
+                        </label>
+                        <label>
+                            단위당 갯수
+                            <input type="number" name="itemsPerUnit" value={form.itemsPerUnit} onChange={handleChange}
+                                   readOnly required/>
+                        </label>
+                    </div>
+                    <div className="row-inline">
+                        <label>
+                            수량
+                            <input type="number" name="quantity" value={form.quantity} onChange={handleChange}
+                                   required/>
+                        </label>
+                        <label>
+                            총 수량
+                            <input type="number" name="totalQuantity" value={form.totalQuantity} readOnly/>
+                        </label>
+                    </div>
                     <label>
                         입고일
-                        <input type="date" name="inboundDate" value={form.inboundDate} onChange={handleChange} disabled={form.id ? true : false} required/>
+                        <input type="date" name="inboundDate" value={form.inboundDate} onChange={handleChange}
+                               disabled={form.id ? true : false} required/>
                     </label>
                     <label>
                         담당자
