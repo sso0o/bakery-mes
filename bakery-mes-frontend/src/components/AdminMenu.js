@@ -7,6 +7,9 @@ const AdminMenu = () => {
             <Link to="/categories/PRODUCT">
                 <button>제품 분류 등록</button>
             </Link>
+            <Link to="/categories/MATERIAL">
+                <button>자재 분류 등록</button>
+            </Link>
             <Link to="/categories/PROCESS">
                 <button>공정 등록</button>
             </Link>

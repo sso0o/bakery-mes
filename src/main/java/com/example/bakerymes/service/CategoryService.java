@@ -35,10 +35,11 @@ public class CategoryService {
     public String generateCode(String type) {
         String prefix;
         switch (type) {
-            case "PRODUCT" -> prefix = "PRD";
+            case "PRODUCT" -> prefix = "PTP";
             case "PROCESS" -> prefix = "PRC";
             case "UNIT" -> prefix = "UNT";
             case "STATUS" -> prefix = "STS";
+            case "MATERIAL" -> prefix = "MTP";
             default -> prefix = "CAT"; // 기본값
         }
 

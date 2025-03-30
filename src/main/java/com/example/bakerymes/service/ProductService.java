@@ -53,4 +53,14 @@ public class ProductService {
 
     }
 
+    public Product updateProduct(Long id, Product np) {
+        Product op = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 제품이 존재하지 않습니다."));
+
+        op.setName(np.getName());
+        op.setUnitOutput(np.getUnitOutput());
+        op.setDescription(np.getDescription());
+
+        return productRepository.save(op);
+    }
 }

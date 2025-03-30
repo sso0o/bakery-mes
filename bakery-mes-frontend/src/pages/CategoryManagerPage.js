@@ -5,23 +5,29 @@ import '../styles/CategoryManagerPage.css';
 
 const CategoryManagerPage = () => {
     const { type } = useParams(); // URL에서 type 추출
-    const [items, setItems] = useState([]);
-    const [form, setForm] = useState({ name: '', codePrefix: '', description: '' });
+    const [categories, setCategories] = useState([]);
+    const [form, setForm] = useState({
+        id: '',
+        name: '',
+        codePrefix: '',
+        description: '',
+    });
+
+    useEffect(() => {
+        fetchCategories();
+    }, [type]);
+
 
     // 공통 조회 함수
     const fetchCategories = async () => {
         try {
             const res = await axios.get(`http://localhost:8080/api/categories?type=${type}`);
-            setItems(res.data);
+            setCategories(res.data);
         } catch (err) {
             console.error('조회 오류', err);
         }
     }
 
-    // useEffect에서 type 기반으로 fetch
-    useEffect(() => {
-        fetchCategories();
-    }, [type]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -31,25 +37,52 @@ const CategoryManagerPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const data = {
-            type: type,
             name: form.name,
-            description: form.description
+            codePrefix: form.codePrefix,
+            description: form.description,
+            type
         };
+
         try {
-            await axios.post('http://localhost:8080/api/categories', data);
-            setForm({ name: '', codePrefix: '', description: '' });
+            if (form.id) {
+                await axios.put(`http://localhost:8080/api/categories/${form.id}`, data);
+                alert('카테고리 수정 완료');
+            } else {
+                await axios.post('http://localhost:8080/api/categories', data);
+                alert('카테고리 등록 완료');
+            }
+            handleReset();
             fetchCategories();
         } catch (err) {
-            alert('등록 실패');
+
+            alert('등록/수정 실패');
         }
+
     };
+
+    const handleReset = () => {
+        setForm({ id: '', name: '', codePrefix: '', description: '' });
+    };
+
+
+    const handleRowClick = (c) => {
+        setForm({
+            id: c.id,
+            name: c.name,
+            codePrefix: c.codePrefix,
+            description: c.description
+        });
+    };
+
+
 
     // 화면에 type 이름 따라 제목 다르게 출력해도 되고
     const label =
         type === 'PROCESS' ? '공정' :
             type === 'UNIT' ? '단위' :
                 type === 'STATUS' ? '상태' :
-                    type === 'PRODUCT' ? '제품' :
+                    type === 'PRODUCT' ? '제품 분류' :
+                        type === 'MATERIAL' ? '자재 분류' :
                     '카테고리';
 
 
@@ -66,22 +99,23 @@ const CategoryManagerPage = () => {
                     </tr>
                     </thead>
                     <tbody>
-                    {items.map(p => (
-                        <tr key={p.id}>
-                            <td>{p.codePrefix}</td>
-                            <td>{p.name}</td>
-                            <td>{p.description}</td>
+                    {categories.map(c => (
+                        <tr key={c.id} onClick={() => handleRowClick(c)}
+                            style={{cursor: 'pointer', background: form.id === c.id ? '#e6f7ff' : ''}} >
+                            <td>{c.name}</td>
+                            <td>{c.codePrefix}</td>
+                            <td>{c.description}</td>
                         </tr>
                     ))}
                     </tbody>
                 </table>
             </div>
             <div className="category-form">
-                <h2>➕ 공정 등록</h2>
+                <h2>➕ {label} 등록</h2>
                 <form onSubmit={handleSubmit}>
                     <label>
-                        코드 (예: PRC011)
-                        <input type="text" name="codePrefix" value={form.codePrefix} placeholder="자동 생성됩니다" readOnly />
+                        코드 (예: PTP011)
+                        <input type="text" name="codePrefix" value={form.codePrefix} placeholder="자동 생성됩니다" readOnly/>
                     </label>
                     <label>
                         이름

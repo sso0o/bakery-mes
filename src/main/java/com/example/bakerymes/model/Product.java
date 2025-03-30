@@ -25,6 +25,11 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category; // 예: 케이크류, 쿠키류 등 제품 분류
 
+    @Column(nullable = true)
+    private Integer unitOutput; // 제품 1회 생산 기준 수량
+
     @Lob
-    private String description; // 반죽량, 발효시간 등 (선택)
+    private String description; // 설명
+
+
 }
