@@ -30,7 +30,8 @@ Spring Boot + React 기반의 생산관리 시스템으로,
 | `ProcessMaterialUsage` | 공정별 자재 사용 이력 |
 | `ProcessResult` | 공정별 생산 실적 |
 
-![image.png](attachment:65e6f1ea-98df-4a3f-a7aa-6fcc2d5d7bb8:image.png)
+[]
+
 
 - ⚙️ 아키텍처:
     - React (Frontend) ↔ Spring Boot (Backend) ↔ MySQL
