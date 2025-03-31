@@ -1,0 +1,90 @@
+.page-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* 왼쪽 테이블 */
+.process-table {
+    flex: 7;
+    padding: 30px;
+    background-color: #f9f9f9;
+    overflow-y: auto;
+}
+
+.process-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.process-table th,
+.process-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+
+.process-table th {
+    background-color: #eaeaea;
+}
+
+/* 오른쪽 폼 */
+.process-form {
+    flex: 3;
+    padding: 30px;
+    background-color: #ffffff;
+    border-left: 1px solid #ddd;
+}
+
+.process-form h2 {
+    font-size: 20px;
+    margin-bottom: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+.process-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.process-form label {
+    display: flex;
+    flex-direction: column;
+    font-size: 15px;
+    color: #333;
+    font-weight: 500;
+}
+
+.process-form input,
+.process-form select {
+    margin-top: 6px;
+    padding: 12px;
+    font-size: 15px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    transition: border-color 0.2s ease;
+}
+
+.process-form input:focus,
+.process-form select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.process-form button {
+    padding: 14px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.process-form button:hover {
+    background-color: #0056b3;
+}
