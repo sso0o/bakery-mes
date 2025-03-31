@@ -39,30 +39,6 @@ const MainPage = () => {
                 {user.role === 'WORKER' && <WorkerMenu />}
 
             </div>
-
-            {/*{user.role === 'ADMIN' && (*/}
-            {/*    <div className="menu-block">*/}
-            {/*        <h3 className="menu-title">📂 관리자 메뉴</h3>*/}
-
-            {/*    </div>*/}
-            {/*)}*/}
-
-            {/*{user.role === 'WORKER' && (*/}
-            {/*    <div className="menu-block">*/}
-            {/*        <h3 className="menu-title">🛠 작업자 메뉴</h3>*/}
-            {/*        <div className="menu-list">*/}
-            {/*            <Link to="/material/register">*/}
-            {/*                <button>자재 등록</button>*/}
-            {/*            </Link>*/}
-            {/*            <Link to="/inbounds">*/}
-            {/*                <button>자재 입고</button>*/}
-            {/*            </Link>*/}
-            {/*            <Link to="/stocks">*/}
-            {/*                <button>자재 조회</button>*/}
-            {/*            </Link>*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*)}*/}
         </div>
     );
 };

@@ -13,6 +13,9 @@ const CommonMenu = () => {
             <Link to="/stocks">
                 <button>자재 조회</button>
             </Link>
+            <Link to="/process-results">
+                <button>생산 실적</button>
+            </Link>
         </>
     );
 };
