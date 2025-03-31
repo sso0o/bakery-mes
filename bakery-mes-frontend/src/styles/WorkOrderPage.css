@@ -30,14 +30,19 @@
     overflow-y: auto;
 }
 
+.workorder-row-canceled {
+    background-color: #f0f0f0;
+    color: #999;
+    text-decoration: line-through;
+}
+
 .work-order-list table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
 }
 
-.work-order-list th,
-.work-order-list td {
+.work-order-list th, .work-order-list td {
     border: 1px solid #ccc;
     padding: 8px;
     text-align: center;
@@ -48,52 +53,67 @@
     cursor: pointer;
 }
 
-.work-order-list tr.selected,
-.work-order-list tr[style*="#eef"] {
-    background-color: #eef !important;
-}
-
 /* 우측 상세/등록 영역 */
-.work-order-detail {
+.work-order-form {
     flex: 3;
     padding: 30px;
-    background-color: #fff;
-    border-left: 1px solid #ccc;
+    background-color: #ffffff;
+    border-left: 1px solid #ddd;
+}
+
+/* 폼 내부 */
+.work-order-form h2 {
+    font-size: 20px;
+    margin-bottom: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+.work-order-form form {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 20px;
 }
 
-.work-order-detail form {
+/* 라벨 구역 */
+.work-order-form label {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-top: 12px;
+    font-size: 15px;
+    color: #333;
+    font-weight: 500;
 }
 
-.work-order-detail label {
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
+/* 입력 필드 & 셀렉트 */
+.work-order-form input,
+.work-order-form select {
+    margin-top: 6px;
+    padding: 12px;
+    font-size: 15px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    transition: border-color 0.2s ease;
 }
 
-.work-order-detail input,
-.work-order-detail select {
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+.work-order-form input:focus,
+.work-order-form select:focus {
+    border-color: #007bff;
+    outline: none;
 }
 
-.work-order-detail button {
-    padding: 10px;
+/* 등록 버튼 */
+.work-order-form button {
+    padding: 14px;
+    font-size: 16px;
     background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
+    font-weight: bold;
     cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
-.work-order-detail button:hover {
+.work-order-form button:hover {
     background-color: #0056b3;
 }

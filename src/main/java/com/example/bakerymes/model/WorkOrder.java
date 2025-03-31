@@ -39,4 +39,6 @@ public class WorkOrder {
     @OneToMany(mappedBy = "workOrder", cascade = CascadeType.ALL)
     @JsonManagedReference("workorder-lot")
     private List<Lot> lots; // 해당 작업지시로 생성된 제품 LOT 목록
+
+    
 }

@@ -4,6 +4,7 @@ import com.example.bakerymes.dto.WorkOrderRequest;
 import com.example.bakerymes.model.WorkOrder;
 import com.example.bakerymes.service.WorkOrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,4 +25,12 @@ public class WorkOrderController {
     public WorkOrder createWorkOrder(@RequestBody WorkOrderRequest dto) {
         return workOrderService.createWorkOrder(dto);
     }
+
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<Void> cancelWorkOrder(@PathVariable Long id) {
+        workOrderService.cancelWorkOrder(id);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

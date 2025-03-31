@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import "../styles/WorkOrderPage.css";
+import "../styles/CommonStyle.css";
+import {Button} from "react-bootstrap";
 
 const WorkOrderPage = () => {
     const [workOrders, setWorkOrders] = useState([]);
@@ -71,7 +72,22 @@ const WorkOrderPage = () => {
         });
     };
 
+    const handleDelete = async (id) => {
+        if (!window.confirm("정말 취소하시겠습니까?")) return;
+
+        try {
+            await axios.put(`http://localhost:8080/api/work-orders/${id}/cancel`);
+            alert("작업지시가 취소되었습니다.");
+            fetchWorkOrders();
+        } catch (err) {
+            alert("작업지시 취소 실패");
+        }
+    }
+
     const handleRowClick = (order) => {
+        // 취소된 건 무시
+        if (order.status === 'CANCELED') return;
+
         setForm({
             id: order.id,
             productId: order.product.id,
@@ -90,11 +106,11 @@ const WorkOrderPage = () => {
     });
 
     return (
-        <div className="work-order-container">
+        <div className="page-container">
             {/* 좌측: 작업지시 목록 */}
-            <div className="work-order-list">
+            <div className="list-section">
                 <h2>📋 작업지시 목록</h2>
-                <div className="search-bar">
+                <div className="search-section">
                     <input
                         type="text"
                         placeholder="제품명 검색"
@@ -112,7 +128,6 @@ const WorkOrderPage = () => {
                     <thead>
                     <tr>
                         <th>제품</th>
-                        <th>LOT 번호</th>
                         <th>지시일</th>
                         <th>회전수</th>
                         <th>예상수량</th>
@@ -123,10 +138,10 @@ const WorkOrderPage = () => {
                     {filtered.map(order => (
                         <tr
                             key={order.id}
+                            className={order.status === 'CANCELED' ? 'list-row-canceled' : ''}
                             onClick={() => handleRowClick(order)}
-                            style={{cursor: "pointer", background: form.id === order.id ? "#eef" : "white"}}>
+                            style={{cursor: 'pointer', background: form.id === order.id ? '#e6f7ff' : ''}} >
                             <td>{order.product.name}</td>
-                            <td>{order.lots?.map(l => l.lotNumber).join(', ')}</td>
                             <td>{order.orderDate}</td>
                             <td>{order.cycle}</td>
                             <td>{order.cycle * order.product.unitOutput}</td>
@@ -138,7 +153,7 @@ const WorkOrderPage = () => {
             </div>
 
             {/* 우측: 작업지시 등록/상세 폼 */}
-            <div className="work-order-detail">
+            <div className="form-section">
                 <h2>{form.id ? '📝 작업지시 상세' : '➕ 작업지시 등록'}</h2>
                 <form onSubmit={handleSubmit}>
                     <label>
@@ -162,10 +177,27 @@ const WorkOrderPage = () => {
                         총 예상 수량
                         <input type="number" value={form.quantity} readOnly />
                     </label>
-                    <button type="submit" disabled={form.id ? true : false}>등록</button>
+                    <Button type="submit" className="form-action-button" variant="primary">
+                        {form.id ? '수정' : '등록'}
+                    </Button>
                 </form>
                 {form.id && (
-                    <button style={{ marginTop: '10px' }} onClick={handleReset}>폼 초기화</button>
+                    <>
+                        <Button
+                            type="button"
+                            onClick={handleReset}
+                            variant="success"
+                            className="form-action-button">
+                            폼 리셋
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={handleDelete}
+                            variant="danger"
+                            className="form-action-button">
+                            취소
+                        </Button>
+                    </>
                 )}
             </div>
         </div>
