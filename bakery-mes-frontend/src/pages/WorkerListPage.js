@@ -12,6 +12,10 @@ const WorkerListPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);  // 모달 상태 관리
     const navigate = useNavigate();  // useNavigate 훅을 호출하여 navigate 함수 사용
 
+    useEffect(() => {
+        fetchWorkers();
+    }, []);
+
     // 작업자 목록 조회
     const fetchWorkers = async () => {
         try {
@@ -37,10 +41,6 @@ const WorkerListPage = () => {
             })
             .catch(err => alert('작업자 등록 실패'));
     };
-
-    useEffect(() => {
-        fetchWorkers();
-    }, []);
 
     // 홈으로 가는 버튼 클릭 처리
     const goToHome = () => {

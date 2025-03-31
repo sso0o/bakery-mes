@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -38,8 +39,12 @@ public class MaterialInboundService {
         inbound.setStatus(Status.ACTIVE);
         inboundRepository.save(inbound);
 
-        // 롯트 번호 행성
-        String lotNumber = lotService.createLotNumber(material.getCode(), inbound.getInboundDate());
+        // 롯트 번호 prefix 생성
+        String datePart = inbound.getInboundDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String prefix = material.getCode() + "-" + datePart;
+
+        // 롯트 번호 생성
+        String lotNumber = lotService.createLotNumber(prefix);
 
         // 롯드 생성 후 저장
         Lot lot = Lot.builder()

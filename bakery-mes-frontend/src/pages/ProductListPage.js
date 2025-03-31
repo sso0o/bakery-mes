@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../styles/ProductListPage.css';
+import '../styles/CommonStyle.css';
+import {Button} from "react-bootstrap";
 
 const ProductListPage = () => {
     const [products, setProducts] = useState([]);
@@ -88,9 +89,9 @@ const ProductListPage = () => {
 
     return (
         <div className="page-container">
-            <div className="product-list">
+            <div className="list-section">
                 <h2>📋 제품 목록</h2>
-                <div className="product-search">
+                <div className="search-section">
                     <select value={searchCategory} onChange={e => setSearchCategory(e.target.value)}>
                         <option value="">전체 카테고리</option>
                         {categories.map(c => (
@@ -128,7 +129,7 @@ const ProductListPage = () => {
                 </table>
             </div>
 
-            <div className="product-form">
+            <div className="form-section">
                 <h2>➕ 제품 등록</h2>
                 <form onSubmit={handleSubmit}>
                     <label>
@@ -155,13 +156,28 @@ const ProductListPage = () => {
                         설명
                         <input type="text" name="description" value={form.description} onChange={handleChange}/>
                     </label>
-                    <button type="submit">{form.id ? '수정' : '등록'}</button>
+                    <Button type="submit" className="form-action-button" variant="primary">
+                        {form.id ? '수정' : '등록'}
+                    </Button>
                 </form>
+                {/* 리셋, 삭제 버튼 추가 */}
                 {form.id && (
-                    <button type="button" onClick={handleReset}
-                            style={{backgroundColor: 'green', color: 'white', marginTop: '10px', width: '100%'}}>
-                        폼 리셋
-                    </button>
+                    <>
+                        <Button
+                            type="button"
+                            onClick={handleReset}
+                            variant="success"
+                            className="form-action-button">
+                            폼 리셋
+                        </Button>
+                        {/*<Button*/}
+                        {/*    type="button"*/}
+                        {/*    onClick={handleDelete}*/}
+                        {/*    variant="danger"*/}
+                        {/*    className="form-action-button">*/}
+                        {/*    삭제*/}
+                        {/*</Button>*/}
+                    </>
                 )}
             </div>
         </div>

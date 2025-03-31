@@ -41,4 +41,8 @@ public class Lot {
     @Enumerated(EnumType.STRING)
     private Status status; // 예: ACTIVE, CANCELED
 
+    @ManyToOne
+    @JoinColumn(name = "previous_lot_id")
+    private Lot previousLot;
+
 }

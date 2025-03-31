@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../styles/MaterialInboundPage.css';
+import '../styles/CommonStyle.css'
+import {Button} from "react-bootstrap";
 
 export default function MaterialInboundPage() {
     const [inbounds, setInbounds] = useState([]);
@@ -57,30 +58,30 @@ export default function MaterialInboundPage() {
             note: ''  // 비고 값 초기화
         });
 
-        const fetchData = async () => {
-            try {
-                const materialsRes = await axios.get('http://localhost:8080/api/materials');
-                setMaterials(materialsRes.data);
-
-                // 날짜 범위에 맞는 입고 목록 조회
-                const inboundsRes = await axios.get('http://localhost:8080/api/inbound', {
-                    params: {
-                        startDate: startDateFormatted,
-                        endDate: todayFormatted
-                    }
-                });
-                setInbounds(inboundsRes.data);
-
-                const categoriesRes = await axios.get('http://localhost:8080/api/categories?type=MATERIAL');
-                setCategories(categoriesRes.data);
-                setSearchCategories(categoriesRes.data);
-            } catch (error) {
-                console.error("데이터 로딩 실패", error);
-            }
-        };
-
         fetchData();
     }, []);
+
+    const fetchData = async () => {
+        try {
+            const materialsRes = await axios.get('http://localhost:8080/api/materials');
+            setMaterials(materialsRes.data);
+
+            // 날짜 범위에 맞는 입고 목록 조회
+            const inboundsRes = await axios.get('http://localhost:8080/api/inbound', {
+                params: {
+                    startDate: startDateFormatted,
+                    endDate: todayFormatted
+                }
+            });
+            setInbounds(inboundsRes.data);
+
+            const categoriesRes = await axios.get('http://localhost:8080/api/categories?type=MATERIAL');
+            setCategories(categoriesRes.data);
+            setSearchCategories(categoriesRes.data);
+        } catch (error) {
+            console.error("데이터 로딩 실패", error);
+        }
+    };
 
     const handleRowClick = (i) => {
         // 취소된 건 무시
@@ -115,6 +116,7 @@ export default function MaterialInboundPage() {
             if (name === 'materialId') {
                 const selected = materials.find(m => m.id === parseInt(value));
                 if (selected) {
+                    updatedForm.capacity = selected.capacity; // 용량 자동 설정
                     updatedForm.unit = selected.unit;  // 자재의 단위 자동 설정
                     updatedForm.itemsPerUnit = selected.itemsPerUnit;  // itemsPerUnit 자동 설정
                 }
@@ -242,22 +244,22 @@ export default function MaterialInboundPage() {
 
 
     return (
-        <div className="inbound-page-container">
+        <div className="page-container">
             {/* 왼쪽: 자재 현황 */}
-            <div className="inbound-list">
+            <div className="list-section">
                 <h2>📦 자재 입고 현황</h2>
-                <div className="material-search">
+                <div className="search-section">
                     <select value={searchCategoryId} onChange={e => setSearchCategoryId(e.target.value)}>
                         <option value="">전체 카테고리</option>
                         {searchCategories.map(c => (
                             <option key={c.id} value={c.id}>{c.name}</option>
                         ))}
                     </select>
-                <input
-                    type="date"
-                    value={startDate}
-                        onChange={e => setStartDate(e.target.value)}
-                        placeholder="시작일"
+                    <input
+                        type="date"
+                        value={startDate}
+                            onChange={e => setStartDate(e.target.value)}
+                            placeholder="시작일"
                     /> ~
                     <input
                         type="date"
@@ -308,7 +310,7 @@ export default function MaterialInboundPage() {
             </div>
 
             {/* 오른쪽: 자재 입고 폼 */}
-            <div className="inbound-form">
+            <div className="form-section">
                 <h2>➕ 자재 입고 {form.id ? '수정' : '등록'}</h2>
                 <form onSubmit={handleSubmit}>
                     <label>
@@ -370,22 +372,29 @@ export default function MaterialInboundPage() {
                         비고
                         <input type="text" name="note" value={form.note} onChange={handleChange}/>
                     </label>
-                    <button type="submit">입고 {form.id ? '수정' : '등록'}</button>
+                    <Button type="submit" className="form-action-button" variant="primary">
+                        입고 {form.id ? '수정' : '등록'}
+                    </Button>
                 </form>
                 {/* 삭제 버튼 추가 */}
                 {form.id && (
                     <>
-                        <button type="button" onClick={handleReset}
-                                style={{backgroundColor: 'green', color: 'white', marginTop: '10px', width: '100%'}}>
+                        <Button
+                            type="button"
+                            onClick={handleReset}
+                            variant="success"
+                            className="form-action-button">
                             폼 리셋
-                        </button>
-                        <button type="button" onClick={handleCancel}
-                                style={{backgroundColor: 'red', color: 'white', marginTop: '10px', width: '100%'}}>
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={handleCancel}
+                            variant="danger"
+                            className="form-action-button">
                             입고 취소
-                        </button>
+                        </Button>
                     </>
                 )}
-
             </div>
         </div>
     );

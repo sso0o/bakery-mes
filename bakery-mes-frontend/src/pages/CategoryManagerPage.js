@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {useParams} from "react-router-dom";  // 스타일시트 불러오기
-import '../styles/CategoryManagerPage.css';
+import '../styles/CommonStyle.css';
+import {Button} from "react-bootstrap";
 
 const CategoryManagerPage = () => {
     const { type } = useParams(); // URL에서 type 추출
@@ -88,7 +89,7 @@ const CategoryManagerPage = () => {
 
     return (
         <div className="page-container">
-            <div className="category-list">
+            <div className="list-section">
                 <h2>📋 {label} 관리</h2>
                 <table>
                     <thead>
@@ -110,7 +111,7 @@ const CategoryManagerPage = () => {
                     </tbody>
                 </table>
             </div>
-            <div className="category-form">
+            <div className="form-section">
                 <h2>➕ {label} 등록</h2>
                 <form onSubmit={handleSubmit}>
                     <label>
@@ -125,7 +126,9 @@ const CategoryManagerPage = () => {
                         설명
                         <input type="text" name="description" value={form.description} onChange={handleChange} />
                     </label>
-                    <button type="submit">등록</button>
+                    <Button type="submit" className="form-action-button" variant="primary">
+                        {form.id ? '수정' : '등록'}
+                    </Button>
                 </form>
             </div>
         </div>
