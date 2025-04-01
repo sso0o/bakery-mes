@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -73,4 +74,9 @@ public class LotService {
     }
 
 
+    // 오늘까지의 유효한 생산 LOT 조회
+    public List<Lot> getValidLotsForProductionResult() {
+        LocalDate today = LocalDate.now();
+        return lotRepository.findValidLotsForProductionResult(today);
+    }
 }
