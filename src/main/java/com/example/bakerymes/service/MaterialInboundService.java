@@ -41,7 +41,7 @@ public class MaterialInboundService {
 
         // 롯트 번호 prefix 생성
         String datePart = inbound.getInboundDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String prefix = material.getCode() + "-" + datePart;
+        String prefix = "LOT" + material.getCode() + "-" + datePart;
 
         // 롯트 번호 생성
         String lotNumber = lotService.createLotNumber(prefix);

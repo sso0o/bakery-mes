@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -52,7 +53,7 @@ public class WorkOrderService {
         workOrderRepository.save(order);
 
         // LOT 번호 prefix 생성
-        String prefix = product.getCode() + "-" + req.getOrderDate().toString().replace("-", "");
+        String prefix = "LOT" + product.getCode() + "-" + req.getOrderDate().toString().replace("-", "");
 
         // 회전 수만큼 제품 롯트 생성
         for (int i = 1; i <= req.getCycle(); i++) {
@@ -97,5 +98,18 @@ public class WorkOrderService {
             lot.setStatus(Status.CANCELED);
         }
         lotRepository.saveAll(lots);
+    }
+
+    public List<WorkOrder> getValidWorkOrdersUpToToday() {
+        LocalDate today = LocalDate.now();
+        List<WorkOrder> list = workOrderRepository.findByStatusNotAndOrderDateLessThanEqual(
+                WorkOrderStatus.CANCELED, today);
+
+        return list.stream()
+                .sorted(Comparator
+                        .comparing(WorkOrder::getOrderDate)
+                        .thenComparing(WorkOrder::getId)
+                        .reversed()) // 내림차순 정렬
+                .toList();
     }
 }
