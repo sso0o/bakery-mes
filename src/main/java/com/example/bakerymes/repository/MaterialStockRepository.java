@@ -28,4 +28,6 @@ public interface MaterialStockRepository extends JpaRepository<MaterialStock, Lo
             "LEFT JOIN MaterialInbound i on m.id = i.material.id " +
             "LEFT JOIN MaterialStock s ON m.id = s.material.id")
     List<MaterialStockResponse> getMaterialStockWithOptionalInbound();
+
+    List<MaterialStock> findByMaterialId(Long materialId);
 }

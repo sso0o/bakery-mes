@@ -1,12 +1,8 @@
 package com.example.bakerymes.service;
 
 import com.example.bakerymes.dto.ProductProcessRequest;
-import com.example.bakerymes.model.Category;
-import com.example.bakerymes.model.Product;
-import com.example.bakerymes.model.ProductProcess;
-import com.example.bakerymes.repository.CategoryRepository;
-import com.example.bakerymes.repository.ProductProcessRepository;
-import com.example.bakerymes.repository.ProductRepository;
+import com.example.bakerymes.model.*;
+import com.example.bakerymes.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +16,8 @@ public class ProductProcessService {
     private final ProductProcessRepository ppRepository;
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final LotRepository lotRepository;
+    private final WorkOrderRepository woRepository;
 
     // 전체 공정 조회 (제품별)
     public List<ProductProcess> getProcessesByProduct(Long productId) {
@@ -87,4 +85,20 @@ public class ProductProcessService {
     }
 
 
+    public List<ProductProcess> getProcessesByLotId(Long lotId) {
+        Lot lot = lotRepository.findById(lotId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 LOT이 존재하지 않습니다."));
+
+        WorkOrder wo = woRepository.findById(lot.getWorkOrder().getId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 작업이 존재하지 않습니다."));
+
+        Product product = productRepository.findById(wo.getProduct().getId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 제품이 존재하지 않습니다."));
+
+        return ppRepository.findByProductIdOrderByStepOrder(product.getId());
+
+
+
+
+    }
 }

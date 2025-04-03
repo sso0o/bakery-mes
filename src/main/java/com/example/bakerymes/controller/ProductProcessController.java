@@ -22,6 +22,13 @@ public class ProductProcessController {
         return ppService.getProcessesByProduct(productId);
     }
 
+    @GetMapping("/by-lot/{lotId}")
+    public List<ProductProcess> getByLot(@PathVariable Long lotId){
+        return ppService.getProcessesByLotId(lotId);
+    }
+
+
+
     @PostMapping
     public ProductProcess register(@RequestBody ProductProcessRequest request) {
         return ppService.addProcessToProduct(request);

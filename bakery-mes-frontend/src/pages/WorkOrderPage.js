@@ -26,6 +26,7 @@ const WorkOrderPage = () => {
     const fetchWorkOrders = async () => {
         const res = await axios.get("http://localhost:8080/api/work-orders");
         setWorkOrders(res.data);
+
     };
 
     const fetchProducts = async () => {
@@ -35,7 +36,32 @@ const WorkOrderPage = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
+
+        setForm(prev => {
+            const updatedForm = { ...prev, [name]: value };
+
+            // 제품 선택 시 unitOutput → quantity 세팅
+            if (name === 'productId') {
+                const selected = products.find(p => p.id === parseInt(value));
+                if (selected) {
+                    const cycle = parseFloat(updatedForm.cycle) || 1;
+                    updatedForm.quantity = selected.unitOutput * cycle;
+                }
+            }
+
+            // 사이클 변경 시 → productId 통해 unitOutput 찾고 quantity 계산
+            if (name === 'cycle') {
+                const selected = products.find(p => p.id === parseInt(updatedForm.productId));
+                if (selected) {
+                    const cycle = parseFloat(value) || 1;
+                    updatedForm.quantity = selected.unitOutput * cycle;
+                }
+            }
+
+
+            return updatedForm;
+
+        });
     };
 
     const handleSubmit = async (e) => {
@@ -72,17 +98,25 @@ const WorkOrderPage = () => {
         });
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm("정말 취소하시겠습니까?")) return;
+
+    const handleDelete = async () => {
+        if (!form.id) {
+            alert('취소할 작업을 선택하세요.');
+            return;
+        }
+
+        const confirmDelete = window.confirm('정말로 작업을 취소하시겠습니까?');
+        if (!confirmDelete) return;
 
         try {
-            await axios.put(`http://localhost:8080/api/work-orders/${id}/cancel`);
+            await axios.put(`http://localhost:8080/api/work-orders/${form.id}/cancel`);
             alert("작업지시가 취소되었습니다.");
             fetchWorkOrders();
+            handleReset();
         } catch (err) {
             alert("작업지시 취소 실패");
         }
-    }
+    };
 
     const handleRowClick = (order) => {
         // 취소된 건 무시
@@ -175,7 +209,7 @@ const WorkOrderPage = () => {
                     </label>
                     <label>
                         총 예상 수량
-                        <input type="number" value={form.quantity} readOnly />
+                        <input type="quantity" value={form.quantity} readOnly />
                     </label>
                     <Button type="submit" className="form-action-button" variant="primary">
                         {form.id ? '수정' : '등록'}

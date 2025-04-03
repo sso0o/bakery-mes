@@ -1,9 +1,13 @@
 package com.example.bakerymes.controller;
 
 import com.example.bakerymes.model.Lot;
+import com.example.bakerymes.model.ProductProcess;
+import com.example.bakerymes.repository.ProductProcessRepository;
 import com.example.bakerymes.service.LotService;
+import com.example.bakerymes.service.ProductProcessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,5 +25,6 @@ public class LotController {
     public List<Lot> getValidLotsForResult() {
         return lotService.getValidLotsForProductionResult();
     }
+
 
 }

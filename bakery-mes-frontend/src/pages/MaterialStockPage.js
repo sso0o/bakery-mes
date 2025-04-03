@@ -15,7 +15,7 @@ export default function MaterialStockPage() {
     const fetchData = async () => {
         try {
             const [stockRes, categoryRes] = await Promise.all([
-                axios.get('http://localhost:8080/api/materials/stocks'),
+                axios.get('http://localhost:8080/api/material-stocks'),
                 axios.get(`http://localhost:8080/api/categories?type=PRODUCT`)
             ]);
             setStocks(stockRes.data);

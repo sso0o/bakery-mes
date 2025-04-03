@@ -1,6 +1,7 @@
 .page-container {
     display: flex;
-    height: 100vh;
+    flex: 1; /* 높이 자동으로 맞춤 */
+    min-height: 0; /* 필요 시 오버플로 방지 */
 }
 
 /* 검색창 영역 */

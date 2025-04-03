@@ -22,7 +22,7 @@ const ProductProcessPage = () => {
     const [materialForm, setMaterialForm] = useState({
         materialId: '',
         quantity: '',
-        unit: ''
+        outUnit: ''
     });
 
 
@@ -102,7 +102,7 @@ const ProductProcessPage = () => {
         if (name === 'materialId') {
             const selected = materials.find(m => m.id === parseInt(value));
             if (selected) {
-                setMaterialForm(prev => ({ ...prev, unit: selected.unit }));
+                setMaterialForm(prev => ({ ...prev, unit: selected.outUnit }));
             }
         }
     };
@@ -192,7 +192,7 @@ const ProductProcessPage = () => {
             estimatedMinutes: item.estimatedMinutes ?? ''
         });
 
-        setMaterialForm({ materialId: '', quantity: '', unit: '' });
+        setMaterialForm({ materialId: '', quantity: '', outUnit: '' });
         fetchProcessMaterials(item.id); // 공정별 자재 조회
     };
 
@@ -206,13 +206,13 @@ const ProductProcessPage = () => {
             productProcess: { id: selectedProcessId },  // productProcessId만 전송
             material: { id: materialForm.materialId }, // materialId만 전송
             quantity: parseFloat(materialForm.quantity),
-            unit: materialForm.unit
+            unit: materialForm.outUnit
         };
 
         try {
             await axios.post('http://localhost:8080/api/process-materials', data);
             alert('자재 소모 등록 완료');
-            setMaterialForm({ materialId: '', quantity: '', unit: '' });
+            setMaterialForm({ materialId: '', quantity: '', outUnit: '' });
             fetchProcessMaterials(selectedProcessId); // 공정별 자재 조회
         } catch (e) {
             alert('등록 실패');
@@ -352,7 +352,7 @@ const ProductProcessPage = () => {
                                     <td>{m.material.code}</td> {/* 자재 코드 */}
                                     <td>{m.material.name}</td> {/* 자재 이름 */}
                                     <td>{m.quantity}</td> {/* 소모량 */}
-                                    <td>{m.unit}</td> {/* 단위 */}
+                                    <td>{m.outUnit}</td> {/* 단위 */}
                                 </tr>
                             ))}
                             </tbody>
@@ -422,7 +422,7 @@ const ProductProcessPage = () => {
                         </label>
                         <label>
                             단위
-                            <input type="text" name="unit" value={materialForm.unit} readOnly/>
+                            <input type="text" name="outUnit" value={materialForm.outUnit} readOnly/>
                         </label>
                         <button type="submit">등록</button>
                     </form>
