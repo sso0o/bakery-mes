@@ -4,6 +4,12 @@ import { Link } from 'react-router-dom';
 const AdminMenu = () => {
     return (
         <>
+            <Link to="/orders">
+                <button>수주 관리</button>
+            </Link>
+            <Link to="/production-plans">
+                <button>생산 관리</button>
+            </Link>
             <Link to="/categories/PRODUCT">
                 <button>제품 분류 등록</button>
             </Link>
@@ -26,7 +32,10 @@ const AdminMenu = () => {
                 <button>제품 등록</button>
             </Link>
             <Link to="/products-process">
-                <button>제품별 공정 등록</button>
+                <button>BOM 등록</button>
+            </Link>
+            <Link to="/boms">
+                <button>BOM 조회</button>
             </Link>
         </>
     );
