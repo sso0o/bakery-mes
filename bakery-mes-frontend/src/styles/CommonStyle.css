@@ -1,3 +1,7 @@
+/*
+ * 리스트7 : 폼3
+*/
+
 .page-container {
     display: flex;
     flex: 1; /* 높이 자동으로 맞춤 */
