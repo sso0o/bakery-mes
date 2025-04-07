@@ -32,6 +32,6 @@ public class OrderItem {
 
     private int quantity;
 
-    @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true) // cascade 추가
     private List<OrderRequirement> orderRequirements = new ArrayList<>();
 }

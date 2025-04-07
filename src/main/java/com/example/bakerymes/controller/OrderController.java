@@ -37,6 +37,13 @@ public class OrderController {
         return ResponseEntity.ok(savedOrder);
     }
 
+    // 수주 수정
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateOrder(@PathVariable Long id, @RequestBody OrderRequest request) {
+        orderService.updateOrder(id, request);
+        return ResponseEntity.ok().build();
+    }
+
     // 수주 취소 처리
     @PutMapping("/{id}/cancel")
     public ResponseEntity<Void> cancelOrder(@PathVariable Long id) {

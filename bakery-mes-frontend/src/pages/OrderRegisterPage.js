@@ -89,12 +89,21 @@ const OrderRegisterPage = () => {
                 items: form.items.filter(i => i.productId && i.quantity > 0),
             };
 
-            await axios.post('http://localhost:8080/api/orders', data);
-            alert('수주 등록 완료');
+            if (form.id) {
+                // 수정
+                await axios.put(`http://localhost:8080/api/orders/${form.id}`, data);
+                alert('수주 수정 완료');
+            } else {
+                // 등록
+                await axios.post('http://localhost:8080/api/orders', data);
+                alert('수주 등록 완료');
+            }
+
             handleReset();
+            fetchData();
 
         } catch (error) {
-            console.error('수주 등록 실패:', error);
+            console.error('처리 실패:', error);
             alert('등록 중 오류가 발생했습니다.');
         }
     };
@@ -189,25 +198,71 @@ const OrderRegisterPage = () => {
                     </label>
                     <label>
                         제품 목록
-                        {form.items.map((item, idx) => (
-                            <div key={idx} className="row-inline">
-                                <select value={item.productId}
-                                        onChange={e => handleItemChange(idx, 'productId', e.target.value)}>
-                                    <option value="">제품 선택</option>
-                                    {productList.map(p => (
-                                        <option key={p.id} value={p.id}>{p.name}</option>
-                                    ))}
-                                </select>
-                                <input type="number" min="1" value={item.quantity}
-                                       onChange={e => handleItemChange(idx, 'quantity', e.target.value)}/>
-                                <Button type="button" onClick={() => removeItem(idx)}
-                                        variant="danger"
-                                        disabled={form.id && form.status !== 'RECEIVED'}>삭제</Button>
-                            </div>
-                        ))}
+                        {form.items.map((item, idx) => {
+                            const selected = productList.find(p => p.id === parseInt(item.productId));
+
+                            return (
+                                <div className="row-block" style={{marginBottom: '10px'}}>
+                                    {/* 윗줄: 제품 선택 + 삭제 버튼 */}
+                                    <div style={{display: 'flex', gap: '10px', alignItems: 'center', width: '100%' }}>
+                                        <select value={item.productId}
+                                                onChange={e => handleItemChange(idx, 'productId', e.target.value)}
+                                                style={{ flex: 1 }} >
+                                            <option value="">제품 선택</option>
+                                            {productList.map(p => (
+                                                <option key={p.id} value={p.id}>{p.name}</option>
+                                            ))}
+                                        </select>
+                                        <Button type="button"
+                                                onClick={() => removeItem(idx)}
+                                                variant="danger"
+                                                disabled={form.id && form.status !== 'RECEIVED'}>
+                                            삭제
+                                        </Button>
+                                    </div>
+
+                                    {/* 밑줄: 단위 수량 + 주문 수량 */}
+                                    <div style={{display: 'flex', gap: '10px', marginTop: '5px', alignItems: 'center', width: '100%' }}>
+                                        <input type="number"
+                                               value={selected?.unitOutput || ''}
+                                               placeholder="단위 수량"
+                                               style={{ flex: 1 }}
+                                               readOnly
+                                        />
+                                        <p style={{margin: 0}}>X</p>
+                                        <input type="number"
+                                               min="1"
+                                               value={item.quantity}
+                                               onChange={e => handleItemChange(idx, 'quantity', e.target.value)}
+                                               style={{ flex: 1 }}
+                                        />
+                                    </div>
+                                </div>
+                                // <div key={idx} className="row-inline">
+                                //     <select value={item.productId}
+                                //             onChange={e => handleItemChange(idx, 'productId', e.target.value)}>
+                                //         <option value="">제품 선택</option>
+                                //         {productList.map(p => (
+                                //             <option key={p.id} value={p.id}>{p.name}</option>
+                                //         ))}
+                                //     </select>
+                                //
+                                //     <input type="number" value={selected?.unitOutput || ''} placeholder="단위 수량" readOnly/>
+                                //     <input type="number" min="1" value={item.quantity}
+                                //            onChange={e => handleItemChange(idx, 'quantity', e.target.value)}/>
+                                //     <Button type="button" onClick={() => removeItem(idx)}
+                                //             variant="danger"
+                                //             disabled={form.id && form.status !== 'RECEIVED'}>
+                                //         삭제
+                                //     </Button>
+                                //
+                                //
+                                // </div>
+                            );
+                        })}
                         <Button type="button" onClick={addItem}
                                 variant="secondary"
-                                style={{ marginTop: '10px' }}
+                                style={{marginTop: '10px'}}
                                 disabled={form.id && form.status !== 'RECEIVED'}>
                             제품 추가</Button>
                     </label>
