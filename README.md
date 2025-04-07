@@ -16,19 +16,22 @@ Spring Boot + React 기반의 생산관리 시스템으로,
 
 - 📌 주요 테이블
 
-| 테이블명 | 설명                     |
-| --- |------------------------|
-| `Category` | 공정, 제품, 자재 등 공통 분류 테이블 |
-| `Product` | 제품 정보                  |
-| `ProductProcess` | 제품별 공정 정보 ( BOM 연동)    |
-| `ProcessMaterial` | 공정별 자재 소모 정보 ( BOM 연동) |
-| `Material` | 자재 정보                  |
-| `MaterialInbound` | 자재 입고 내역               |
-| `MaterialStock` | 자재 재고 정보               |
-| `WorkOrder` | 작업지시 정보                |
-| `Lot` | LOT 정보 (제품/자재 모두 포함)   |
+| 테이블명                   | 설명                     |
+|------------------------|------------------------|
+| `Category`             | 공정, 제품, 자재 등 공통 분류 테이블 |
+| `Product`              | 제품 정보                  |
+| `ProductProcess`       | 제품별 공정 정보 ( BOM 연동)    |
+| `ProcessMaterial`      | 공정별 자재 소모 정보 ( BOM 연동) |
+| `Material`             | 자재 정보                  |
+| `MaterialInbound`      | 자재 입고 내역               |
+| `MaterialStock`        | 자재 재고 정보               |
+| `WorkOrder`            | 작업지시 정보                |
+| `Lot`                  | LOT 정보 (제품/자재 모두 포함)   |
 | `ProcessMaterialUsage` | 공정별 자재 사용 이력           |
-| `ProcessResult` | 공정별 생산 실적              |
+| `ProcessResult`        | 공정별 생산 실적              |
+| `Order`                | 수주 정보                  |
+| `OrderItem`            | 수주별 제품 및 수량            |
+| `ProductionPlan`       | 생산 계획                  |
 
 []
 
