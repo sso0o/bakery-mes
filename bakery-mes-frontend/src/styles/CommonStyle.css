@@ -77,7 +77,8 @@
     background-color: #ffffff;
     border-left: 1px solid #ddd;
     box-sizing: border-box;
-    overflow: hidden; /* ← 여기가 핵심 */
+    overflow-y: auto;
+    max-height: 90vh;
 }
 
 .form-section-box {
