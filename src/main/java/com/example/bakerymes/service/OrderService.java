@@ -23,6 +23,7 @@ public class OrderService {
     private final OrderRequirementRepository orRepository;
     private final ProductRepository productRepository;
     private final ProcessMaterialRepository pmRepository;
+    private final ProductStockRepository psRepository;
 
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
@@ -39,7 +40,24 @@ public class OrderService {
     }
 
     public OrderSummaryResponse getOrderSummary(Long productId) {
-        return orderRepository.findOrderSummaryByProductId(productId);
+        // 제품 정보
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 제품입니다 "));
+
+        // 해당 제품을 포함한 수주 목록
+        List<Order> orders = oiRepository.findOrdersByProductId(productId);
+        // 해당 제품의 총 수주 수량 계산
+        Long totalOrderQuantity = oiRepository.sumQuantityByProductId(productId);
+        // 재고 수량 (예: MaterialStock or ProductStock 기준)
+        Long totalStockQuantity = psRepository.sumStockByProductId(productId);
+
+        return new OrderSummaryResponse(
+                productId,
+                product.getName(),
+                orders,
+                totalOrderQuantity != null ? totalOrderQuantity : 0,
+                totalStockQuantity != null ? totalStockQuantity : 0
+        );
     }
 
 

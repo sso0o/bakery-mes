@@ -11,7 +11,7 @@ import java.util.List;
 public interface ProductionPlanRepository extends JpaRepository<ProductionPlan, Long> {
     List<ProductionPlan> findByProduct(Product product);
 
-    List<ProductionPlan> findByProductIdOrderByPlanDate(Long productId);
+    List<ProductionPlan> findByProductOrderByPlanDate(Product product);
 
     @Query("SELECT SUM(p.quantity) FROM ProductionPlan p WHERE p.product.id = :productId")
     Integer getTotalPlannedQuantity(@Param("productId") Long productId);

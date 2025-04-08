@@ -5,7 +5,9 @@ import {Button} from "react-bootstrap";
 
 const ProductionPlanPage = () => {
     const [products, setProducts] = useState([]);
+    const [orders, setOrders] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [productSummary, setProductSummary] = useState(null);
     const [stockMap, setStockMap] = useState({});
     const [orderMap, setOrderMap] = useState({});
     const [plans, setPlans] = useState([]);
@@ -31,29 +33,42 @@ const ProductionPlanPage = () => {
         // setStockMap(stockRes.data);
     };
 
-    // 제품 선택 시 수주량 정보 로딩
-    useEffect(() => {
-        if (selectedProduct) {
-            const fetchOrderSummary = async () => {
-                const orderRes = await axios.get(`http://localhost:8080/api/orders/summary`, {
-                    params: { productId: selectedProduct.id }
-                });
-                setOrderMap(orderRes.data);
-            };
-            fetchOrderSummary();
-        } else {
-            setOrderMap({});
-        }
-    }, [selectedProduct]);
+    // // 제품 선택 시 수주량 정보 로딩
+    // useEffect(() => {
+    //     if (selectedProduct) {
+    //         fetchOrderSummary();
+    //     } else {
+    //         setOrderMap({});
+    //     }
+    // }, [selectedProduct]);
 
     const fetchPlans = async (productId) => {
-        const res = await axios.get(`http://localhost:8080/api/production-plans/${productId}`);
-        setPlans(res.data);
+        const planRes = await axios.get(`http://localhost:8080/api/production-plans/${productId}`);
+        setPlans(planRes.data);
     };
 
-    const handleProductClick = (product) => {
+    const fetchOrderSummary = async (product) => {
+        if (!product || !product.id) return;
+
+        const orderRes = await axios.get(`http://localhost:8080/api/orders/summary`, {
+            params: { productId: product.id }
+        });
+
+        setOrders(orderRes.data.orders);
+        setProductSummary(orderRes.data);
+
+        // orders 붙여서 selectedProduct 갱신
+        setSelectedProduct({
+            ...product,
+            orders: orderRes.data.orders
+        });
+    };
+
+    const handleProductClick = async (product) => {
         setSelectedProduct(product);
-        // fetchPlans(product.id);
+
+        await fetchPlans(product.id);
+        await fetchOrderSummary(product); // selectedProduct 사용 안 함!
     };
 
     const handlePlanAdd = async () => {
@@ -97,39 +112,90 @@ const ProductionPlanPage = () => {
                 <table>
                     <thead>
                     <tr>
-                        <th>분류</th>
-                        <th>코드</th>
-                        <th>제품명</th>
+                        <th colSpan={2}>분류</th>
+                        <th colSpan={2}>코드</th>
+                        <th colSpan={2}>제품명</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {filteredProducts.map(p => {
-                        const orderQty = orderMap[p.id] || 0;
-                        const stockQty = stockMap[p.id] || 0;
-                        const needQty = orderQty - stockQty;
-                        return (
-                            <tr key={p.id} onClick={() => handleProductClick(p)}
-                                style={{backgroundColor: selectedProduct?.id === p.id ? '#e6f7ff' : ''}}>
-                                <td>{p.category?.name}</td>
-                                <td>{p.code}</td>
-                                <td>{p.name}</td>
+                    {filteredProducts.map(p => (
+                        <React.Fragment key={p.id}>
+                            <tr onClick={() => handleProductClick(p)}
+                                style={{ backgroundColor: selectedProduct?.id === p.id ? '#e6f7ff' : '' }}>
+                                <td colSpan={2}>{p.category?.name}</td>
+                                <td colSpan={2}>{p.code}</td>
+                                <td colSpan={2}>{p.name}</td>
                             </tr>
-                        );
-                    })}
+
+                            {selectedProduct?.id === p.id && (() => {
+                                let hasRenderedHeader = false;
+
+                                return orders.map((o, idx) => {
+                                    const matchedItem = o.items.find(item => item.product.id === p.id);
+
+                                    const renderHeader = !hasRenderedHeader && (matchedItem != null);
+                                    if (renderHeader) hasRenderedHeader = true;
+
+                                    return (
+                                        <React.Fragment key={`order-${o.id}`}>
+                                            {renderHeader && (
+                                                <tr>
+                                                    <th>수주번호</th>
+                                                    <th>수주처</th>
+                                                    <th>수주일</th>
+                                                    <th>납기일</th>
+                                                    <th>수주량</th>
+                                                </tr>
+                                            )}
+                                            {matchedItem && (
+                                                <tr style={{ backgroundColor: '#f9f9f9' }}>
+                                                    <td>{o.orderNo}</td>
+                                                    <td>{o.customerName}</td>
+                                                    <td>{o.orderDate}</td>
+                                                    <td>{o.dueDate}</td>
+                                                    <td>{matchedItem.quantity}</td>
+                                                </tr>
+                                            )}
+                                        </React.Fragment>
+                                    );
+                                });
+                            })()}
+
+                        </React.Fragment>
+                    ))}
                     </tbody>
                 </table>
-                {selectedProduct && (
-                    <div className="summary-box">
-                        <p>수주량: {orderMap[selectedProduct.id] || 0}</p>
-                        <p>현재 재고: {stockMap[selectedProduct.id] || 0}</p>
-                        <p>필요 생산량: {(orderMap[selectedProduct.id] || 0) - (stockMap[selectedProduct.id] || 0)}</p>
-                    </div>
-                )}
+
             </div>
 
             {/* 가운데 영역 - 생산계획 입력 */}
             <div className="center-section">
                 <h2>🗓 생산 계획</h2>
+                <div className="summary-box">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>수주량</th>
+                            <th>현재 재고</th>
+                            <th>필요 생산량</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {productSummary ? (
+                            <tr>
+                                <td>{productSummary.totalOrderQuantity}</td>
+                                <td>{productSummary.totalStockQuantity}</td>
+                                <td>{productSummary.totalOrderQuantity - productSummary.totalStockQuantity}</td>
+                            </tr>
+                        ) : (
+                            <tr>
+                                <td colSpan={3}></td>
+                            </tr>
+                        )}
+                        </tbody>
+                    </table>
+                </div>
+
                 {selectedProduct && (
                     <>
                         <div className="plan-input">
@@ -157,7 +223,8 @@ const ProductionPlanPage = () => {
                         </table>
                         <div className="plan-summary">
                             총 계획 수량: {getTotalPlanQuantity()}<br/>
-                            필요 수량 대비: {Math.min(100, Math.round((getTotalPlanQuantity() / ((orderMap[selectedProduct.id] || 0) - (stockMap[selectedProduct.id] || 0))) * 100))}%
+                            필요 수량
+                            대비: {Math.min(100, Math.round((getTotalPlanQuantity() / ((orderMap[selectedProduct.id] || 0) - (stockMap[selectedProduct.id] || 0))) * 100))}%
                         </div>
                     </>
                 )}

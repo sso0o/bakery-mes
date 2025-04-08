@@ -20,7 +20,9 @@ public class ProductionPlanService {
     private final ProductRepository productRepository;
 
     public List<ProductionPlan> getPlansByProduct(Long productId) {
-        return productionPlanRepository.findByProductIdOrderByPlanDate(productId);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("제품을 찾을 수 없습니다"));
+        return productionPlanRepository.findByProductOrderByPlanDate(product);
     }
 
     public ProductionPlan savePlan(Long productId, LocalDate date, int quantity) {

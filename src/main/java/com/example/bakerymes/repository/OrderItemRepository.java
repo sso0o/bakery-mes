@@ -1,5 +1,6 @@
 package com.example.bakerymes.repository;
 
+import com.example.bakerymes.model.Order;
 import com.example.bakerymes.model.OrderItem;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +20,9 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     void deleteByOrderId(@Param("orderId") Long orderId);
 
 
+    @Query("SELECT DISTINCT oi.order FROM OrderItem oi WHERE oi.product.id = :productId AND oi.order.status = 'RECEIVED'")
+    List<Order> findOrdersByProductId(@Param("productId") Long productId);
+
+    @Query("SELECT SUM(oi.quantity) FROM OrderItem oi WHERE oi.product.id = :productId AND oi.order.status = 'RECEIVED'")
+    Long sumQuantityByProductId(@Param("productId") Long productId);
 }
