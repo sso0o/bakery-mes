@@ -30,7 +30,7 @@ public class ProductProcessController {
 
 
     @PostMapping
-    public ProductProcess register(@RequestBody ProductProcessRequest request) {
+    public ProductProcess create(@RequestBody ProductProcessRequest request) {
         return ppService.addProcessToProduct(request);
     }
 

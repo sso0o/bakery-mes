@@ -29,18 +29,18 @@ public class ProductProcessService {
     }
 
     // 공정 등록
-    public ProductProcess addProcessToProduct(ProductProcessRequest dto) {
-        Product product = productRepository.findById(dto.getProductId())
+    public ProductProcess addProcessToProduct(ProductProcessRequest req) {
+        Product product = productRepository.findById(req.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("제품 없음"));
 
-        Category process = categoryRepository.findById(dto.getProcessId())
+        Category process = categoryRepository.findById(req.getProcessId())
                 .orElseThrow(() -> new IllegalArgumentException("공정 없음"));
 
         ProductProcess pp = ProductProcess.builder()
                 .product(product)
                 .process(process)
-                .stepOrder(dto.getStepOrder())
-                .estimatedMinutes(dto.getEstimatedMinutes())
+                .stepOrder(req.getStepOrder())
+                .estimatedMinutes(req.getEstimatedMinutes())
                 .build();
 
         return ppRepository.save(pp);
@@ -70,16 +70,16 @@ public class ProductProcessService {
         ppRepository.deleteById(id);
     }
 
-    public ProductProcess updateProcess(Long id, ProductProcessRequest dto) {
+    public ProductProcess updateProcess(Long id, ProductProcessRequest req) {
         ProductProcess target = ppRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 공정을 찾을 수 없습니다."));
 
-        Category process = categoryRepository.findById(dto.getProcessId())
+        Category process = categoryRepository.findById(req.getProcessId())
                 .orElseThrow(() -> new IllegalArgumentException("공정을 찾을 수 없습니다."));
 
         target.setProcess(process);
-        target.setStepOrder(dto.getStepOrder());
-        target.setEstimatedMinutes(dto.getEstimatedMinutes());
+        target.setStepOrder(req.getStepOrder());
+        target.setEstimatedMinutes(req.getEstimatedMinutes());
 
         return ppRepository.save(target);
     }
