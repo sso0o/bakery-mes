@@ -29,12 +29,13 @@ Spring Boot + React 기반의 생산관리 시스템으로,
 | `Lot`                  | LOT 정보 (제품/자재 모두 포함)   |
 | `ProcessMaterialUsage` | 공정별 자재 사용 이력           |
 | `ProcessResult`        | 공정별 생산 실적              |
+| `ProductStock`         | 제품 재고 정보               |
 | `Order`                | 수주 정보                  |
 | `OrderItem`            | 수주별 제품 및 수량            |
 | `OrderRequirement`     | 수주-제품 별 필요 자재량         |
 | `ProductionPlan`       | 생산 계획                  |
 
-[]
+<img src="./upload/ERD.png" width="700"/>
 
 
 - ⚙️ 아키텍처:
