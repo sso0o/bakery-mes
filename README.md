@@ -126,8 +126,42 @@ Spring Boot + React 기반의 생산관리 시스템으로,
 ---
 
 ## 🎞️ 화면 흐름
+<img src="./upload/main.png" width="500"/>
+🔼 메인화면
 
-[]
+<img src="./upload/order.png" width="500"/>
+🔼 수주 관리
 
-- 제품 등록 → 공정 등록 → 작업지시 → 실적 등록 흐름
-- 각 페이지별 캡처 및 기능 설명
+<img src="./upload/materialRegister.png" width="500"/>
+🔼 자재 관리
+
+<img src="./upload/inbound.png" width="500"/>
+🔼 자재 입고
+
+- 자재 입고시 자동 LOT번호 생성
+
+<img src="./upload/productRegister.png" width="500"/>
+🔼 제품 등록
+
+<img src="./upload/bomRegister.png" width="500"/>
+🔼 제품별 공정, 자재 소모량 등록 화면
+
+- 공정 복사기능
+- 제품 별 공정 등록 가능
+- 공정 별 자재 등록 가능
+
+<img src="./upload/productionPlan.png" width="500"/>
+🔼 생산 관리
+
+- 제품별 재고, 수주량, 필요생산량 자동 계산
+- 생산 계획 작업지시로 변경 가능
+- 작업지시로 변환전인 계획단계에서만 취소 가능
+
+<img src="./upload/workOrder.png" width="500"/>
+🔼 작업지시 화면
+
+- 작업 사이클당 LOT번호 자동 생성
+- 작업지시 취소시 연결된 생산계획 있으면 반영
+
+<img src="./upload/processResult.png" width="500"/>
+🔼 생산실적 등록 화면(진행중)
