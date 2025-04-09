@@ -39,6 +39,7 @@
     flex: 7;
     padding: 30px;
     background-color: #f9f9f9;
+    border: 1px solid #ddd;
     overflow-y: auto;
 }
 
@@ -75,7 +76,7 @@
     flex: 3;
     padding: 30px;
     background-color: #ffffff;
-    border-left: 1px solid #ddd;
+    border: 1px solid #ddd;
     box-sizing: border-box;
     overflow-y: auto;
     max-height: 90vh;

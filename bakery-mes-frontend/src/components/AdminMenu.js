@@ -10,18 +10,18 @@ const AdminMenu = () => {
             <Link to="/production-plans">
                 <button>생산 관리</button>
             </Link>
-            <Link to="/categories/PRODUCT">
-                <button>제품 분류 등록</button>
+            <Link to="/categories">
+                <button>카테고리 관리</button>
             </Link>
-            <Link to="/categories/MATERIAL">
-                <button>자재 분류 등록</button>
-            </Link>
-            <Link to="/categories/PROCESS">
-                <button>공정 등록</button>
-            </Link>
-            <Link to="/categories/STATUS">
-                <button>상태 등록</button>
-            </Link>
+            {/*<Link to="/categories/MATERIAL">*/}
+            {/*    <button>자재 분류 등록</button>*/}
+            {/*</Link>*/}
+            {/*<Link to="/categories/PROCESS">*/}
+            {/*    <button>공정 등록</button>*/}
+            {/*</Link>*/}
+            {/*<Link to="/categories/STATUS">*/}
+            {/*    <button>상태 등록</button>*/}
+            {/*</Link>*/}
             <Link to="/work-orders">
                 <button>작업 지시</button>
             </Link>

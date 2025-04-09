@@ -74,6 +74,28 @@
     background: #d9363e;
 }
 
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background-color: transparent;
+}
+
+table th, table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+table th {
+    background-color: #f0f0f0;
+}
+
+
+
+
 /* 반응형: 태블릿 이하 (화면 너비 1024px 이하) */
 @media (max-width: 1024px) {
     .menu-list button {

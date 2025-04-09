@@ -4,6 +4,9 @@ import { Link } from 'react-router-dom';
 const CommonMenu = () => {
     return (
         <>
+            <Link to="/product-stocks">
+                <button>제품 재고</button>
+            </Link>
             <Link to="/material/register">
                 <button>자재 등록</button>
             </Link>

@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Modal from 'react-modal'; // react-modal 패키지 import
-import { useNavigate } from 'react-router-dom'; // useNavigate 훅 import
-import '../styles/WorkerList.css';
-
-Modal.setAppElement('#root');  // 접근성을 위한 설정
+import "../styles/CommonStyle.css";
 
 const WorkerListPage = () => {
     const [workers, setWorkers] = useState([]);
     const [form, setForm] = useState({ name: '' });
-    const [isModalOpen, setIsModalOpen] = useState(false);  // 모달 상태 관리
-    const navigate = useNavigate();  // useNavigate 훅을 호출하여 navigate 함수 사용
 
     useEffect(() => {
         fetchWorkers();
@@ -37,42 +31,17 @@ const WorkerListPage = () => {
                 alert('작업자가 등록되었습니다!');
                 setForm({ name: '' });
                 fetchWorkers();
-                setIsModalOpen(false); // 작업자 등록 후 모달 닫기
             })
             .catch(err => alert('작업자 등록 실패'));
     };
 
-    // 홈으로 가는 버튼 클릭 처리
-    const goToHome = () => {
-        navigate('/main');  // 홈 페이지로 이동
-    };
 
-    // 모달 열기
-    const openModal = () => setIsModalOpen(true);
-
-    // 모달 닫기
-    const closeModal = () => setIsModalOpen(false);
 
     return (
-        <div className="worker-list-container">
-            <div className="go-home-button">
-                <button onClick={goToHome}>홈으로 가기</button>
-            </div>
-
-            <div className="worker-list">
-                <h2>🛠 작업자 목록
-                    {/* 타이틀 옆에 버튼 추가 */}
-                    {/*<button onClick={openModal} style={{*/}
-                    {/*    marginLeft: '20px',*/}
-                    {/*    padding: '10px',*/}
-                    {/*    backgroundColor: '#4caf50',*/}
-                    {/*    color: 'white',*/}
-                    {/*    borderRadius: '5px'*/}
-                    {/*}}>작업자 등록*/}
-                    {/*</button>*/}
-                    <button onClick={openModal} className="worker-register-button">작업자 등록</button>
-                </h2>
-                <table border="1" cellPadding="10">
+        <div className="page-container">
+            <div className="list-section">
+                <h2>🛠 작업자 목록</h2>
+                <table>
                     <thead>
                     <tr>
                         <th>아이디</th>
@@ -92,35 +61,9 @@ const WorkerListPage = () => {
                 </table>
             </div>
 
-            {/* 모달창 */}
-            <Modal
-                isOpen={isModalOpen}
-                onRequestClose={closeModal}
-                contentLabel="작업자 등록"
-                className="modal-overlay"
-            >
-                <div className="modal-content">
-                    <div className="modal-header">
-                        <h3>작업자 등록</h3>
-                        {/* 상단 닫기 버튼 */}
-                        <button onClick={closeModal} className="modal-close">×</button>
-                    </div>
-                    <div className="modal-body">
-                        <form onSubmit={handleSubmit}>
-                            <input
-                                name="name"
-                                value={form.name}
-                                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                placeholder="이름"
-                                required
-                            />
-                            <br />
-                            <button type="submit" className="modal-footer-button">등록</button>
-                        </form>
-                    </div>
-                    {/* 추가 닫기 버튼 제거 */}
-                </div>
-            </Modal>
+            <div className="form-section">
+                <h2>🛠 작업자 등록</h2>
+            </div>
 
 
         </div>
