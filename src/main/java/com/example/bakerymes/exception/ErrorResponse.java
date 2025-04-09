@@ -1,9 +1,9 @@
 package com.example.bakerymes.exception;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 @AllArgsConstructor
 public class ErrorResponse {
     private String message;
