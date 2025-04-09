@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import {useParams} from "react-router-dom";  // 스타일시트 불러오기
 import '../styles/CommonStyle.css';
-import {Button} from "react-bootstrap";
+import { Button, Tab, Tabs } from 'react-bootstrap';
+
+const typeLabelMap = {
+    PROCESS: '공정',
+    UNIT: '단위',
+    STATUS: '상태',
+    PRODUCT: '제품 분류',
+    MATERIAL: '자재 분류',
+};
+
+const tabTypes = Object.keys(typeLabelMap);
 
 const CategoryManagerPage = () => {
-    const { type } = useParams(); // URL에서 type 추출
+    const [type, setType] = useState('PROCESS'); // 기본 탭
     const [categories, setCategories] = useState([]);
     const [form, setForm] = useState({
         id: '',
@@ -76,63 +85,185 @@ const CategoryManagerPage = () => {
     };
 
 
-
-    // 화면에 type 이름 따라 제목 다르게 출력해도 되고
-    const label =
-        type === 'PROCESS' ? '공정' :
-            type === 'UNIT' ? '단위' :
-                type === 'STATUS' ? '상태' :
-                    type === 'PRODUCT' ? '제품 분류' :
-                        type === 'MATERIAL' ? '자재 분류' :
-                    '카테고리';
-
-
     return (
-        <div className="page-container">
-            <div className="list-section">
-                <h2>📋 {label} 관리</h2>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>코드</th>
-                        <th>이름</th>
-                        <th>설명</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {categories.map(c => (
-                        <tr key={c.id} onClick={() => handleRowClick(c)}
-                            style={{cursor: 'pointer', background: form.id === c.id ? '#e6f7ff' : ''}} >
-                            <td>{c.name}</td>
-                            <td>{c.codePrefix}</td>
-                            <td>{c.description}</td>
+        <div style={{display: 'block', width: '100%'}}>
+            <Tabs
+                id="category-tab"
+                activeKey={type}
+                onSelect={(k) => setType(k)} >
+                {tabTypes.map((t) => (
+                    <Tab eventKey={t} title={typeLabelMap[t]} key={t}/>
+                ))}
+            </Tabs>
+
+            <div className="page-container">
+                <div className="list-section">
+                    <h2>📋 {typeLabelMap[type]} 목록</h2>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>이름</th>
+                            <th>코드</th>
+                            <th>설명</th>
                         </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
-            <div className="form-section">
-                <h2>➕ {label} 등록</h2>
-                <form onSubmit={handleSubmit}>
-                    <label>
-                        코드 (예: PTP011)
-                        <input type="text" name="codePrefix" value={form.codePrefix} placeholder="자동 생성됩니다" readOnly/>
-                    </label>
-                    <label>
-                        이름
-                        <input type="text" name="name" value={form.name} onChange={handleChange} required />
-                    </label>
-                    <label>
-                        설명
-                        <input type="text" name="description" value={form.description} onChange={handleChange} />
-                    </label>
-                    <Button type="submit" className="form-action-button" variant="primary">
-                        {form.id ? '수정' : '등록'}
-                    </Button>
-                </form>
+                        </thead>
+                        <tbody>
+                        {categories.map(c => (
+                            <tr
+                                key={c.id}
+                                onClick={() => handleRowClick(c)}
+                                style={{
+                                    cursor: 'pointer',
+                                    background: form.id === c.id ? '#e6f7ff' : '',
+                                }}
+                            >
+                                <td>{c.name}</td>
+                                <td>{c.codePrefix}</td>
+                                <td>{c.description}</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div className="form-section">
+                    <h2>➕ {typeLabelMap[type]} 등록</h2>
+                    <form onSubmit={handleSubmit}>
+                        <label>
+                            코드
+                            <input
+                                type="text"
+                                name="codePrefix"
+                                value={form.codePrefix}
+                                placeholder="자동 생성됩니다"
+                                readOnly
+                            />
+                        </label>
+                        <label>
+                            이름
+                            <input
+                                type="text"
+                                name="name"
+                                value={form.name}
+                                onChange={handleChange}
+                                required
+                            />
+                        </label>
+                        <label>
+                            설명
+                            <input
+                                type="text"
+                                name="description"
+                                value={form.description}
+                                onChange={handleChange}
+                            />
+                        </label>
+                        <Button type="submit" className="form-action-button" variant="primary">
+                            {form.id ? '수정' : '등록'}
+                        </Button>
+                    </form>
+                </div>
             </div>
         </div>
+        // <div className="page-container">
+        //
+        //         {tabTypes.map((type) => (
+        //             <Tab eventKey={type} title={typeLabelMap[type]} key={type}>
+        //                 <div className="list-section">
+        //                     <h2>📋 {typeLabelMap[type]} 목록</h2>
+        //                     <table>
+        //                         <thead>
+        //                         <tr>
+        //                             <th>이름</th>
+        //                             <th>코드</th>
+        //                             <th>설명</th>
+        //                         </tr>
+        //                         </thead>
+        //                         <tbody>
+        //                         {categories.map(c => (
+        //                             <tr key={c.id} onClick={() => handleRowClick(c)}
+        //                                 style={{ cursor: 'pointer', background: form.id === c.id ? '#e6f7ff' : '' }}>
+        //                                 <td>{c.name}</td>
+        //                                 <td>{c.codePrefix}</td>
+        //                                 <td>{c.description}</td>
+        //                             </tr>
+        //                         ))}
+        //                         </tbody>
+        //                     </table>
+        //                 </div>
+        //                 <div className="form-section">
+        //                     <h2>➕ {typeLabelMap[type]} 등록</h2>
+        //                     <form onSubmit={handleSubmit}>
+        //                         <label>
+        //                             코드
+        //                             <input type="text" name="codePrefix" value={form.codePrefix} placeholder="자동 생성됩니다" readOnly />
+        //                         </label>
+        //                         <label>
+        //                             이름
+        //                             <input type="text" name="name" value={form.name} onChange={handleChange} required />
+        //                         </label>
+        //                         <label>
+        //                             설명
+        //                             <input type="text" name="description" value={form.description} onChange={handleChange} />
+        //                         </label>
+        //                         <Button type="submit" className="form-action-button" variant="primary">
+        //                             {form.id ? '수정' : '등록'}
+        //                         </Button>
+        //                     </form>
+        //                 </div>
+        //             </Tab>
+        //         ))}
+        //
+        // </div>
     );
+
+
+    // return (
+    //     <div className="page-container">
+    //         <div className="list-section">
+    //             <h2>📋 {label} 관리</h2>
+    //             <table>
+    //                 <thead>
+    //                 <tr>
+    //                     <th>코드</th>
+    //                     <th>이름</th>
+    //                     <th>설명</th>
+    //                 </tr>
+    //                 </thead>
+    //                 <tbody>
+    //                 {categories.map(c => (
+    //                     <tr key={c.id} onClick={() => handleRowClick(c)}
+    //                         style={{cursor: 'pointer', background: form.id === c.id ? '#e6f7ff' : ''}} >
+    //                         <td>{c.name}</td>
+    //                         <td>{c.codePrefix}</td>
+    //                         <td>{c.description}</td>
+    //                     </tr>
+    //                 ))}
+    //                 </tbody>
+    //             </table>
+    //         </div>
+    //         <div className="form-section">
+    //             <h2>➕ {label} 등록</h2>
+    //             <form onSubmit={handleSubmit}>
+    //                 <label>
+    //                     코드 (예: PTP011)
+    //                     <input type="text" name="codePrefix" value={form.codePrefix} placeholder="자동 생성됩니다" readOnly/>
+    //                 </label>
+    //                 <label>
+    //                     이름
+    //                     <input type="text" name="name" value={form.name} onChange={handleChange} required />
+    //                 </label>
+    //                 <label>
+    //                     설명
+    //                     <input type="text" name="description" value={form.description} onChange={handleChange} />
+    //                 </label>
+    //                 <Button type="submit" className="form-action-button" variant="primary">
+    //                     {form.id ? '수정' : '등록'}
+    //                 </Button>
+    //             </form>
+    //         </div>
+    //     </div>
+    // );
 }
 
 
