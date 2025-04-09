@@ -11,4 +11,6 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
 
 
     List<WorkOrder> findByStatusNotAndOrderDateLessThanEqual(WorkOrderStatus status, LocalDate today);
+
+    WorkOrder findByPlan_Id(Long planId);
 }

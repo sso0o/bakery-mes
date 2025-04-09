@@ -22,8 +22,13 @@ public class WorkOrderController {
     }
 
     @PostMapping
-    public WorkOrder createWorkOrder(@RequestBody WorkOrderRequest dto) {
-        return workOrderService.createWorkOrder(dto);
+    public WorkOrder saveWorkOrder(@RequestBody WorkOrderRequest req) {
+        return workOrderService.createWorkOrder(req);
+    }
+
+    @PostMapping("/convert/{planId}")
+    public WorkOrder convertToWorkOrder(@PathVariable Long planId) {
+        return workOrderService.convertPlan(planId); // planId 기반으로 WorkOrder + LOT 생성
     }
 
     @PutMapping("/{id}/cancel")

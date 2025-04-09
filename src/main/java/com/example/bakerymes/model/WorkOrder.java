@@ -40,5 +40,9 @@ public class WorkOrder {
     @JsonManagedReference("workorder-lot")
     private List<Lot> lots; // 해당 작업지시로 생성된 제품 LOT 목록
 
+    @OneToOne
+    @JoinColumn(name = "plan_id", nullable = true) // 계획 없어도 작업지시 가능
+    private ProductionPlan plan;
+
     
 }

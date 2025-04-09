@@ -4,6 +4,7 @@ import com.example.bakerymes.dto.WorkOrderRequest;
 import com.example.bakerymes.model.*;
 import com.example.bakerymes.repository.LotRepository;
 import com.example.bakerymes.repository.ProductRepository;
+import com.example.bakerymes.repository.ProductionPlanRepository;
 import com.example.bakerymes.repository.WorkOrderRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class WorkOrderService {
 
     private final WorkOrderRepository workOrderRepository;
     private final ProductRepository productRepository;
+    private final ProductionPlanRepository ppRepository;
     private final LotRepository lotRepository;
     private final LotService lotService;
 
@@ -73,6 +75,58 @@ public class WorkOrderService {
         return order;
     }
 
+    // 생산 계획 작업지시로 변경
+    @Transactional
+    public WorkOrder convertPlan(Long planId) {
+        // 1. 생산계획 및 제품 조회
+        ProductionPlan plan = ppRepository.findById(planId)
+                .orElseThrow(() -> new RuntimeException("해당 생산계획을 찾을 수 없습니다."));
+        if (plan.getStatus().equals("ORDERED")) {
+            throw new IllegalStateException("이미 작업지시로 전환된 계획입니다.");
+        }
+
+        Product product = productRepository.findById(plan.getProduct().getId())
+                .orElseThrow(() -> new IllegalArgumentException("제품 없음"));
+
+
+        // 2. 작업지시 생성
+        WorkOrder order = WorkOrder.builder()
+                .product(product)
+                .orderDate(plan.getPlanDate())
+                .cycle(plan.getQuantity())
+                .status(WorkOrderStatus.ORDERED)
+                .plan(plan)
+                .build();
+
+        workOrderRepository.save(order);
+
+
+        // 3. LOT 번호 prefix 생성
+        String prefix = "LOT" + product.getCode() + "-" + plan.getPlanDate().toString().replace("-", "");
+
+        // 회전 수만큼 제품 롯트 생성
+        for (int i = 1; i <= plan.getQuantity(); i++) {
+            String lotNumber = lotService.createLotNumber(prefix);
+
+            Lot lot = Lot.builder()
+                    .lotNumber(lotNumber)
+                    .workOrder(order)
+                    .cycle(i)
+                    .createdDate(LocalDate.now())
+                    .status(Status.ACTIVE)
+                    .build();
+
+            lotRepository.save(lot);
+        }
+
+        // 4. 계획 상태 변경
+        plan.setStatus("ORDERED");
+        ppRepository.save(plan);
+
+        return order;
+
+    }
+
     public List<WorkOrder> getAllWorkOrders() {
         return workOrderRepository.findAll(Sort.by(Sort.Direction.DESC, "orderDate", "id"));
     }
@@ -88,16 +142,25 @@ public class WorkOrderService {
             throw new IllegalStateException("이미 취소된 작업지시입니다.");
         }
 
-        // 상태 변경
+        // 1. 작업지시 상태 변경
         workOrder.setStatus(WorkOrderStatus.CANCELED);
         workOrderRepository.save(workOrder);
 
-        // 연결된 LOT도 취소 처리
+        // 2. 연결된 LOT도 취소 처리
         List<Lot> lots = lotRepository.findByWorkOrder(workOrder);
         for (Lot lot : lots) {
             lot.setStatus(Status.CANCELED);
         }
         lotRepository.saveAll(lots);
+
+        // 3. 연결된 생산계획이 있다면 상태 복구
+        ProductionPlan plan = workOrder.getPlan();
+        if (plan != null && "ORDERED".equals(plan.getStatus())) {
+            plan.setStatus("ORDER_CANCELED");
+            ppRepository.save(plan);
+        }
+
+
     }
 
     public List<WorkOrder> getValidWorkOrdersUpToToday() {
@@ -112,4 +175,6 @@ public class WorkOrderService {
                         .reversed()) // 내림차순 정렬
                 .toList();
     }
+
+
 }
