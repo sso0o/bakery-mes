@@ -24,8 +24,12 @@ public class ProductionPlan {
     private LocalDate planDate;
 
     @Column(nullable = false)
-    private int quantity;
+    private Integer quantity;
 
     @Column(nullable = false)
     private String status; // 예: PLANNED, ORDERED
+
+    @OneToOne
+    @JoinColumn(name = "work_order_id")
+    private WorkOrder workOrder;
 }

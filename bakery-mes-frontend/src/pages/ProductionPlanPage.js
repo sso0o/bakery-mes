@@ -11,7 +11,7 @@ const ProductionPlanPage = () => {
     const [stockMap, setStockMap] = useState({});
     const [orderMap, setOrderMap] = useState({});
     const [plans, setPlans] = useState([]);
-    const [newPlan, setNewPlan] = useState({ date: '', quantity: '' });
+    const [newPlan, setNewPlan] = useState({ productId: '', planDate: '', quantity: '' });
 
     const [categories, setCategories] = useState([]);
 
@@ -32,15 +32,6 @@ const ProductionPlanPage = () => {
         // const stockRes = await axios.get('http://localhost:8080/api/material-stocks');
         // setStockMap(stockRes.data);
     };
-
-    // // 제품 선택 시 수주량 정보 로딩
-    // useEffect(() => {
-    //     if (selectedProduct) {
-    //         fetchOrderSummary();
-    //     } else {
-    //         setOrderMap({});
-    //     }
-    // }, [selectedProduct]);
 
     const fetchPlans = async (productId) => {
         const planRes = await axios.get(`http://localhost:8080/api/production-plans/${productId}`);
@@ -65,24 +56,65 @@ const ProductionPlanPage = () => {
     };
 
     const handleProductClick = async (product) => {
+        // 이미 선택된 제품이면 선택 해제
+        if (selectedProduct?.id === product.id) {
+            setSelectedProduct(null);
+            setOrders([]);
+            setProductSummary(null);
+            setPlans([]);
+            setNewPlan(prev => ({ ...prev, productId: '' })); // 초기화
+            return;
+        }
+        // 새 제품 선택
         setSelectedProduct(product);
-
+        setNewPlan(prev => ({ ...prev, productId: product.id })); // 선택 시 자동 세팅
         await fetchPlans(product.id);
-        await fetchOrderSummary(product); // selectedProduct 사용 안 함!
+        await fetchOrderSummary(product);
     };
 
     const handlePlanAdd = async () => {
-        if (!newPlan.date || !newPlan.quantity) return;
+        if (!newPlan.productId || !newPlan.planDate || !newPlan.quantity) {
+            alert('모든 값을 입력해주세요.');
+            return;
+        }
+
         await axios.post('http://localhost:8080/api/production-plans', {
-            productId: selectedProduct.id,
-            date: newPlan.date,
+            productId: newPlan.productId,
+            planDate: newPlan.planDate,
             quantity: parseInt(newPlan.quantity)
         });
-        setNewPlan({ date: '', quantity: '' });
+        setNewPlan({ productId: newPlan.productId, planDate: '', quantity: '' });
         fetchPlans(selectedProduct.id);
     };
 
-    const getTotalPlanQuantity = () => plans.reduce((sum, p) => sum + p.quantity, 0);
+    const removePlan = async (planId) => {
+        if (!window.confirm('정말 이 항목을 취소하시겠습니까?')) return;
+
+        try {
+            await axios.delete(`http://localhost:8080/api/production-plans/${planId}/cancel`);
+            alert('취소되었습니다.');
+            fetchPlans(selectedProduct.id);
+        } catch (error) {
+            console.error('취소 실패:', error);
+            const msg = error.response?.data?.message || '취소 중 오류가 발생했습니다.';
+            alert(msg);
+        }
+    }
+
+    const convertPlan = async (planId) => {
+        if (!window.confirm('이 생산계획을 작업지시로 전환하시겠습니까?')) return;
+
+        try {
+            await axios.post(`http://localhost:8080/api/work-orders/convert/${planId}`);
+            alert('작업지시로 전환되었습니다.');
+            fetchPlans(selectedProduct.id);
+        } catch (error) {
+            console.error('작업지시 전환 실패:', error);
+            const msg = error.response?.data?.message || '작업지시 전환 중 오류가 발생했습니다.';
+            alert(msg);
+        }
+
+    }
 
     const filteredProducts = products.filter(p => {
         const nameMatch = p.name.toLowerCase().includes(searchName.toLowerCase());
@@ -93,10 +125,14 @@ const ProductionPlanPage = () => {
     return (
         <div className="page-container">
             {/* 왼쪽 영역 - 제품 목록 + 수요 정보 */}
-            <div className="left-section">
-                <h2>📦 제품 목록</h2>
+            <div className="first-section">
+                <h2>📋 제품 목록</h2>
                 <div className="search-section">
-                    <select value={searchCategory} onChange={e => setSearchCategory(e.target.value)}>
+                    <select value={searchCategory} onChange={e => {
+                        setSearchCategory(e.target.value);
+                        setSelectedProduct(null); // 제품 선택 해제
+                        setProductSummary(null); // 제품 상태 해제
+                    }}>
                         <option value="">전체 카테고리</option>
                         {categories.map(c => (
                             <option key={c.id} value={c.id}>{c.name}</option>
@@ -169,78 +205,93 @@ const ProductionPlanPage = () => {
             </div>
 
             {/* 가운데 영역 - 생산계획 입력 */}
-            <div className="center-section">
-                <h2>🗓 생산 계획</h2>
-                <div className="summary-box">
+            <div className="second-section">
+                <div className="top-div">
+                    <h2>📦 제품 현황</h2>
+                    <div className="summary-box">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>수주량</th>
+                                <th>현재 재고</th>
+                                <th>필요 생산량</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {productSummary ? (
+                                <tr>
+                                    <td>{productSummary.totalOrderQuantity}</td>
+                                    <td>{productSummary.totalStockQuantity}</td>
+                                    <td>{productSummary.totalOrderQuantity - productSummary.totalStockQuantity}</td>
+                                </tr>
+                            ) : (
+                                <tr>
+                                    <td>0</td>
+                                    <td>0</td>
+                                    <td>0</td>
+                                </tr>
+                            )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div className="bottom-div">
+                    <h2>🗓 생산 계획</h2>
+                    <div className="plan-input">
+                        {/* 내부적으로 productId는 숨겨서 저장 */}
+                        <input type="hidden" name="productId" value={selectedProduct?.id || ''} />
+                        <input type="text" name="productName" value={selectedProduct?.name || '제품을 선택해주세요'} style={{ textAlign: 'center' }} readOnly />
+                        <input type="date" name="planDate" value={newPlan.planDate}
+                               onChange={e => setNewPlan(prev => ({...prev, planDate: e.target.value}))}/>
+                        <input type="number" min="1" value={newPlan.quantity}
+                               onChange={e => setNewPlan(prev => ({...prev, quantity: e.target.value}))}/>
+                        <Button onClick={handlePlanAdd}>추가</Button>
+                    </div>
                     <table>
                         <thead>
                         <tr>
-                            <th>수주량</th>
-                            <th>현재 재고</th>
-                            <th>필요 생산량</th>
+                            <th>제품</th>
+                            <th>작업일자</th>
+                            <th>수량(사이클)</th>
+                            <th>상태</th>
+                            <th>전환</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {productSummary ? (
-                            <tr>
-                                <td>{productSummary.totalOrderQuantity}</td>
-                                <td>{productSummary.totalStockQuantity}</td>
-                                <td>{productSummary.totalOrderQuantity - productSummary.totalStockQuantity}</td>
+                        {plans.map(p => (
+                            <tr key={p.id}>
+                                <td>{selectedProduct?.name || ''}</td>
+                                <td>{p.planDate}</td>
+                                <td>{p.quantity}</td>
+                                <td>{p.status}</td>
+                                <td>
+                                    <div style={{display: 'flex', gap: '8px', justifyContent: 'center'}}>
+                                        <Button type="button"
+                                                variant="primary"
+                                                onClick={() => convertPlan(p.id)}
+                                                disabled={p.status !== 'PLANNED'}>
+                                        작업 지시
+                                        </Button>
+                                        <Button type="button"
+                                                variant="danger"
+                                                onClick={() => removePlan(p.id)}
+                                                disabled={p.status === 'ORDERED'}>
+                                            삭제
+                                        </Button>
+                                    </div>
+                                </td>
                             </tr>
-                        ) : (
-                            <tr>
-                                <td colSpan={3}></td>
-                            </tr>
-                        )}
+                        ))}
                         </tbody>
                     </table>
                 </div>
 
-                {selectedProduct && (
-                    <>
-                        <div className="plan-input">
-                            <input type="date" value={newPlan.date}
-                                   onChange={e => setNewPlan(prev => ({...prev, date: e.target.value}))}/>
-                            <input type="number" min="1" value={newPlan.quantity}
-                                   onChange={e => setNewPlan(prev => ({...prev, quantity: e.target.value}))}/>
-                            <button onClick={handlePlanAdd}>추가</button>
-                        </div>
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>날짜</th>
-                                <th>수량</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {plans.map(p => (
-                                <tr key={p.id}>
-                                    <td>{p.date}</td>
-                                    <td>{p.quantity}</td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
-                        <div className="plan-summary">
-                            총 계획 수량: {getTotalPlanQuantity()}<br/>
-                            필요 수량
-                            대비: {Math.min(100, Math.round((getTotalPlanQuantity() / ((orderMap[selectedProduct.id] || 0) - (stockMap[selectedProduct.id] || 0))) * 100))}%
-                        </div>
-                    </>
-                )}
+                {/*{selectedProduct && (*/}
+
+                {/*)}*/}
             </div>
 
-            {/* 오른쪽 영역 - 요약 및 작업지시 전환 */}
-            <div className="right-section">
-                <h2>📋 계획 요약</h2>
-                {selectedProduct && (
-                    <>
-                        <p>총 계획 수량: {getTotalPlanQuantity()}</p>
-                        <p>필요 수량: {(orderMap[selectedProduct.id] || 0) - (stockMap[selectedProduct.id] || 0)}</p>
-                        <button onClick={() => alert('작업지시로 전환 기능은 추후 구현')}>작업지시로 전환</button>
-                    </>
-                )}
-            </div>
+
         </div>
     );
 };

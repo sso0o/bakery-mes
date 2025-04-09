@@ -1,13 +1,12 @@
 package com.example.bakerymes.controller;
 
 import com.example.bakerymes.dto.ProductionPlanDto;
+import com.example.bakerymes.dto.ProductionPlanRequest;
 import com.example.bakerymes.model.ProductionPlan;
 import com.example.bakerymes.service.ProductionPlanService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -23,13 +22,11 @@ public class ProductionPlanController {
     }
 
     @PostMapping
-    public ProductionPlan createPlan(@RequestParam Long productId,
-                                     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate planDate,
-                                     @RequestParam int quantity) {
-        return productionPlanService.savePlan(productId, planDate, quantity);
+    public ProductionPlan savePlan(@RequestBody ProductionPlanRequest req) {
+        return productionPlanService.savePlan(req);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/cancel")
     public void deletePlan(@PathVariable Long id) {
         productionPlanService.deletePlan(id);
     }

@@ -1,47 +1,63 @@
 package com.example.bakerymes.service;
 
-import com.example.bakerymes.dto.ProductionPlanDto;
+import com.example.bakerymes.dto.ProductionPlanRequest;
 import com.example.bakerymes.model.Product;
 import com.example.bakerymes.model.ProductionPlan;
+import com.example.bakerymes.model.WorkOrder;
 import com.example.bakerymes.repository.ProductRepository;
 import com.example.bakerymes.repository.ProductionPlanRepository;
+import com.example.bakerymes.repository.WorkOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProductionPlanService {
 
-    private final ProductionPlanRepository productionPlanRepository;
+    private final ProductionPlanRepository ppRepository;
     private final ProductRepository productRepository;
+    private final WorkOrderRepository woRepository;
 
     public List<ProductionPlan> getPlansByProduct(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("제품을 찾을 수 없습니다"));
-        return productionPlanRepository.findByProductOrderByPlanDate(product);
+        return ppRepository.findByProductOrderByPlanDate(product);
     }
 
-    public ProductionPlan savePlan(Long productId, LocalDate date, int quantity) {
-        Product product = productRepository.findById(productId)
+    public ProductionPlan savePlan(ProductionPlanRequest req) {
+        Product product = productRepository.findById(req.getProductId())
                 .orElseThrow(() -> new RuntimeException("제품을 찾을 수 없습니다"));
         ProductionPlan plan = ProductionPlan.builder()
                 .product(product)
-                .planDate(date)
-                .quantity(quantity)
+                .planDate(req.getPlanDate())
+                .quantity(req.getQuantity())
+                .status("PLANNED")
                 .build();
-        return productionPlanRepository.save(plan);
+        return ppRepository.save(plan);
     }
 
     public void deletePlan(Long id) {
-        productionPlanRepository.deleteById(id);
+        ProductionPlan plan = ppRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("해당 생산계획을 찾을 수 없습니다"));
+
+        if ("ORDERED".equals(plan.getStatus())) {
+            throw new IllegalStateException("작업지시로 전환된 계획은 삭제할 수 없습니다.");
+        }
+
+        WorkOrder order = woRepository.findByPlan_Id(id);
+        if (order != null) {
+            order.setPlan(null);
+            woRepository.save(order);
+        }
+
+        ppRepository.delete(plan);
     }
 
     public int getTotalPlannedQuantity(Long productId) {
-        Integer total = productionPlanRepository.getTotalPlannedQuantity(productId);
+        Integer total = ppRepository.getTotalPlannedQuantity(productId);
         return total != null ? total : 0;
     }
 }
